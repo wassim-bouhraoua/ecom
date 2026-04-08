@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { CartProvider } from "./context/CartContext"; // 👈 ADD THIS
+
+import { CartProvider } from "@/app/context/CartContext";
+import Navbar from "@/app/components/Navbar"; 
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,23 +17,26 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "My Store",
-  description: "Simple ecommerce app",
+  description: "E-commerce app",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <CartProvider>
-          {children}
+
+        <CartProvider> 
+          <Navbar /> {}
+          <main className="flex-1">{children}</main>
         </CartProvider>
+
       </body>
     </html>
   );

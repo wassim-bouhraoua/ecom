@@ -3,7 +3,7 @@
 import { use } from "react";
 import { useCart } from "@/app/context/CartContext";
 
-const products = [
+const products = [ // fake dbb
   {
     id: "phone",
     name: "Phone",
@@ -24,14 +24,14 @@ const products = [
   }
 ];
 
-export default function ProductPage({
+export default function ProductPage({ //ROUTING SYSTEM
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { addToCart } = useCart();
+  const { addToCart } = useCart(); //CART CONNECTION
 
-  // ✅ unwrap params (Next.js 15 fix)
+  
   const { id } = use(params);
 
   const product = products.find((p) => p.id === id);
@@ -40,7 +40,7 @@ export default function ProductPage({
     return <p className="p-6 text-red-500">Product not found</p>;
   }
 
-  return (
+  return ( //ui
     <div className="max-w-6xl mx-auto p-8">
       <div className="grid md:grid-cols-2 gap-10">
 
