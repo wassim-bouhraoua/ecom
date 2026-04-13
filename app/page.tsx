@@ -2,13 +2,32 @@ import Link from "next/link";//Next.js navigation
 
 export default function Home() { //React component
   return (//what user sees on screen
-    <div className="max-w-6xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-2">🛍️ My Store</h1>
-      <p className="text-gray-500 mb-8">Browse our collection of products.</p>
+    <div className="max-w-6xl mx-auto p-8 grid md:grid-cols-2 gap-10 items-center">
 
-      <Link href="/product" className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition inline-block">
-        Go to Products (testing)
-      </Link>
-    </div>
+  {/* LEFT */}
+  <div className="space-y-6">
+    <h1 className="text-4xl md:text-5xl font-bold">
+      🛍️ My Store
+    </h1>
+
+    <p className="text-gray-400 text-lg">
+      Discover amazing products at unbeatable prices.
+    </p>
+
+    <Link
+      href="/product"
+      className="inline-block bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition"
+    >
+      Shop Now
+    </Link>
+  </div>
+
+  {/* RIGHT (IMAGE) */}
+  <img
+    src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9"
+    className="rounded-xl shadow-lg"
+  />
+
+</div>
   );
 }
