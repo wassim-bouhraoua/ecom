@@ -7,7 +7,7 @@ Browse products, view details, and manage your cart — all in a clean and simpl
 
 ## 🌍 Live Demo
 
-👉 https://learning-bice.vercel.app
+👉 [https://learning-bice.vercel.app](https://ecom-chi-puce.vercel.app/)
 
 ---
 
