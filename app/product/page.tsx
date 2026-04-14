@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
+import { products } from "@/app/data/products";
 
 export default function Page() {
   const { addToCart } = useCart();
@@ -12,31 +13,8 @@ export default function Page() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
-  const products = [
-    {
-      id: "phone",
-      name: "Phone",
-      category: "phone",
-      price: 300,
-      image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9"
-    },
-    {
-      id: "laptop",
-      name: "Laptop",
-      category: "laptop",
-      price: 1000,
-      image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8"
-    },
-    {
-      id: "headphones",
-      name: "Headphones",
-      category: "audio",
-      price: 100,
-      image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
-    }
-  ];
+  const categories = ["all", ...new Set(products.map(p => p.category))];
 
-  // 🔥 REAL FILTER LOGIC
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name
       .toLowerCase()
@@ -57,7 +35,6 @@ export default function Page() {
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-6">
 
-      {/* TITLE */}
       <h1 className="text-3xl font-bold">Products</h1>
 
       {/* SEARCH */}
@@ -69,22 +46,30 @@ export default function Page() {
         className="w-full px-4 py-2 rounded-lg border"
       />
 
-      {/* FILTER BAR */}
+      {/* FILTER */}
       <div className="flex flex-wrap gap-4 items-center">
 
-        {/* CATEGORY */}
-        <select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
-  className="px-4 py-2 rounded-lg bg-white text-black border border-gray-300 shadow-sm focus:outline-none focus:ring-2 focus:ring-black"
->
-  <option value="all">All Categories</option>
-  <option value="phone">Phones</option>
-  <option value="laptop">Laptops</option>
-  <option value="audio">Audio</option>
-</select>
+       <div className="relative inline-block">
 
-        {/* MIN PRICE */}
+  <select
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+    className="px-4 py-2 pr-10 rounded-lg bg-black text-white border border-gray-600 appearance-none cursor-pointer"
+  >
+    {categories.map((cat) => (
+      <option key={cat} value={cat}>
+        {cat === "all" ? "All Categories" : cat}
+      </option>
+    ))}
+  </select>
+
+  {/* 🔽 Arrow */}
+  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+    ▼
+  </span>
+
+</div>
+
         <input
           type="number"
           placeholder="Min Price"
@@ -93,7 +78,6 @@ export default function Page() {
           className="px-4 py-2 border rounded-lg w-32"
         />
 
-        {/* MAX PRICE */}
         <input
           type="number"
           placeholder="Max Price"
@@ -102,7 +86,6 @@ export default function Page() {
           className="px-4 py-2 border rounded-lg w-32"
         />
 
-        {/* RESET BUTTON */}
         <button
           onClick={() => {
             setCategory("all");
@@ -114,7 +97,6 @@ export default function Page() {
         >
           Reset
         </button>
-
       </div>
 
       {/* GRID */}
@@ -126,7 +108,6 @@ export default function Page() {
 
               <img
                 src={product.image}
-                alt={product.name}
                 className="w-full h-48 object-cover"
               />
 
@@ -141,7 +122,7 @@ export default function Page() {
                     e.preventDefault();
                     addToCart(product);
                   }}
-                  className="mt-3 w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
+                  className="mt-3 w-full bg-black text-white py-2 rounded-lg"
                 >
                   Add to Cart
                 </button>
@@ -153,11 +134,9 @@ export default function Page() {
         ))}
       </div>
 
-      {/* NO RESULTS */}
       {filteredProducts.length === 0 && (
         <p className="text-gray-500">No products found.</p>
       )}
-
     </div>
   );
 }
