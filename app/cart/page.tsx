@@ -57,7 +57,7 @@ export default function CartPage() {
       e.stopPropagation();
       decreaseQuantity(item.id);
     }}
-    className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-200 transition"
+    className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
   >
     −
   </button>
@@ -71,7 +71,7 @@ export default function CartPage() {
       e.stopPropagation();
       addToCart(item);
     }}
-    className="px-3 py-1 text-lg font-bold text-gray-700 hover:bg-gray-200 transition"
+    className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
   >
     +
   </button>
@@ -84,7 +84,7 @@ export default function CartPage() {
                   e.stopPropagation();
                   removeFromCart(item.id);
                 }}
-                className="text-red-500 font-semibold"
+                className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
               >
                 Remove
               </button>
@@ -97,7 +97,7 @@ export default function CartPage() {
       {cart.length > 0 && (
         <div className="mt-10 text-right">
           <p className="text-2xl font-bold">Total: ${getTotal()}</p>
-          <button className="mt-4 bg-black text-white px-6 py-3 rounded-lg">
+          <button className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer">
             Checkout
           </button>
         </div>

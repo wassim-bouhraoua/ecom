@@ -1,6 +1,6 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { products } from "@/app/data/products";
 
@@ -10,6 +10,7 @@ export default function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { addToCart } = useCart();
+  const [message, setMessage] = useState("");
 
   const { id } = use(params);
 
@@ -21,12 +22,21 @@ export default function ProductPage({
 
   return (
     <div className="max-w-6xl mx-auto p-8">
+
+      {/* ✅ TOAST MESSAGE */}
+      {message && (
+        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          {message}
+        </div>
+      )}
+
       <div className="grid md:grid-cols-2 gap-10">
 
         {/* IMAGE */}
-        <div className="bg-white rounded-xl p-6 shadow">
+        <div className="bg-white rounded-xl p-6 shadow hover:shadow-xl transition">
           <img
             src={product.image}
+            alt={product.name}
             className="w-full h-80 object-contain"
           />
         </div>
@@ -44,16 +54,32 @@ export default function ProductPage({
           </p>
 
           <div className="flex gap-4 mt-4">
+
+            {/* ✅ ADD TO CART */}
             <button
-              onClick={() => addToCart(product)}
-              className="bg-black text-white px-6 py-3 rounded-lg"
+              onClick={() => {
+                if (message) return;
+
+                addToCart(product);
+
+                setMessage(`✅ ${product.name} added to cart`);
+
+                setTimeout(() => {
+                  setMessage("");
+                }, 2000);
+              }}
+              className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
             >
               Add to Cart
             </button>
 
-            <button className="border px-6 py-3 rounded-lg">
-              Buy Now
-            </button>
+            {/* BUY NOW */}
+            <button
+  className="border border-white text-white py-2 px-4 rounded-lg hover:bg-white hover:text-black active:scale-95 transition cursor-pointer"
+>
+  Buy Now
+</button>
+
           </div>
         </div>
 

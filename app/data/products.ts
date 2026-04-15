@@ -1,4 +1,4 @@
-export const products = [
+export const products = [ //fake database
   {
     id: "phone",
     name: "Phone",

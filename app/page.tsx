@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 
 export default function Home() {
   const { addToCart } = useCart();
+  const [message, setMessage] = useState("");
 
   const featuredProducts = [
     {
@@ -32,6 +34,13 @@ export default function Home() {
 
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-20">
+
+      {/* ✅ TOAST MESSAGE */}
+      {message && (
+        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
+          {message}
+        </div>
+      )}
 
       {/* 🔥 HERO SECTION */}
       <div className="grid md:grid-cols-2 gap-10 items-center">
@@ -111,9 +120,18 @@ export default function Home() {
                   <button
                     onClick={(e) => {
                       e.preventDefault();
+
+                      if (message) return;
+
                       addToCart(product);
+
+                      setMessage(`✅ ${product.name} added to cart`);
+
+                      setTimeout(() => {
+                        setMessage("");
+                      }, 2000);
                     }}
-                    className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800"
+                    className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
                   >
                     Add to Cart
                   </button>
