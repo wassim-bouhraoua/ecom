@@ -2,48 +2,73 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import { products } from "@/app/data/products";
 
 export default function CheckoutPage() {
   const { cart, getTotal, clearCart } = useCart();
+  const router = useRouter();
 
-  // state object for all inputs
+  // 🔍 get product from URL (Buy Now)
+  const searchParams = useSearchParams();
+  const productId = searchParams.get("product");
+
+  // 🔍 find product if Buy Now
+  const singleProduct = products.find((p) => p.id === productId);
+
+  // 🎯 decide what to show
+  const itemsToShow = singleProduct
+    ? [{ ...singleProduct, quantity: 1 }]
+    : cart;
+
+  // 💰 total
+  const total = singleProduct
+    ? singleProduct.price
+    : getTotal();
+
+  // 📝 form state
   const [form, setForm] = useState({
     name: "",
     address: "",
     card: "",
   });
 
-  //  error 
   const [error, setError] = useState("");
-
-  //  success 
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false); // ✨ prevent spam click
 
-  // handler for all inputs
+  // handle input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
-      ...form, // keep previous values
-      [e.target.name]: e.target.value, // update only changed field
+      ...form,
+      [e.target.name]: e.target.value,
     });
   };
 
-  //  checkout logic
+  // 🧾 checkout logic
   const handleCheckout = () => {
+    if (loading) return;
+
     const { name, address, card } = form;
 
-    // validation
+    // ❌ validation
     if (!name || !address || !card) {
       setError("⚠️ Please fill all fields");
       return;
     }
 
-    // success
+    // ✅ success
     setError("");
     setSuccess(true);
+    setLoading(true);
 
-    // clear cart after order
     setTimeout(() => {
+      // 💾 save correct order (cart OR buy now)
+      localStorage.setItem("lastOrder", JSON.stringify(itemsToShow));
+
       clearCart();
+
+      router.push("/thank-you"); // ✅ better navigation
     }, 1000);
   };
 
@@ -51,7 +76,7 @@ export default function CheckoutPage() {
     <div className="max-w-6xl mx-auto p-8">
       <h1 className="text-3xl font-bold mb-10">Checkout</h1>
 
-      {/* SUCCESS MESSAGE */}
+      {/* SUCCESS */}
       {success && (
         <div className="mb-6 bg-green-100 text-green-700 p-4 rounded-lg">
           ✅ Order placed successfully!
@@ -62,19 +87,17 @@ export default function CheckoutPage() {
 
         {/* LEFT: FORM */}
         <div className="space-y-6">
-
           <h2 className="text-xl font-semibold">Shipping Details</h2>
 
-          {/*  ERROR MESSAGE */}
+          {/* ERROR */}
           {error && (
             <div className="bg-red-100 text-red-700 p-3 rounded-lg">
               {error}
             </div>
           )}
 
-          {/* INPUT: NAME */}
           <input
-            name="name" 
+            name="name"
             type="text"
             placeholder="Full Name"
             value={form.name}
@@ -82,7 +105,6 @@ export default function CheckoutPage() {
             className="w-full px-4 py-3 border rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-white"
           />
 
-          {/* INPUT: ADDRESS */}
           <input
             name="address"
             type="text"
@@ -92,7 +114,6 @@ export default function CheckoutPage() {
             className="w-full px-4 py-3 border rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-white"
           />
 
-          {/* INPUT: CARD */}
           <input
             name="card"
             type="text"
@@ -102,37 +123,30 @@ export default function CheckoutPage() {
             className="w-full px-4 py-3 border rounded-lg bg-transparent focus:outline-none focus:ring-2 focus:ring-white"
           />
 
-          {/* BUTTON */}
           <button
             onClick={handleCheckout}
-            disabled={!form.name || !form.address || !form.card}
+            disabled={loading || !form.name || !form.address || !form.card}
             className="w-full bg-white text-black py-3 rounded-lg font-semibold hover:bg-gray-200 active:scale-95 transition disabled:opacity-50"
           >
-            Place Order
+            {loading ? "Processing..." : "Place Order"}
           </button>
-
         </div>
 
-        {/* RIGHT: ORDER SUMMARY */}
+        {/* RIGHT: SUMMARY */}
         <div className="bg-white text-black rounded-xl p-6 shadow space-y-4">
-
           <h2 className="text-xl font-semibold">Order Summary</h2>
 
-          {/* EMPTY STATE */}
-          {cart.length === 0 && (
-            <p className="text-gray-500">No items in cart</p>
+          {/* EMPTY */}
+          {itemsToShow.length === 0 && (
+            <p className="text-gray-500">No items</p>
           )}
 
           {/* ITEMS */}
-          {cart.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between text-sm"
-            >
+          {itemsToShow.map((item) => (
+            <div key={item.id} className="flex justify-between text-sm">
               <div>
                 {item.name} × {item.quantity}
               </div>
-
               <div>
                 ${item.price * item.quantity}
               </div>
@@ -144,9 +158,8 @@ export default function CheckoutPage() {
           {/* TOTAL */}
           <div className="flex justify-between font-bold text-lg">
             <span>Total</span>
-            <span>${getTotal()}</span>
+            <span>${total}</span>
           </div>
-
         </div>
 
       </div>

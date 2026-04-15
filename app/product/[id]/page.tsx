@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { products } from "@/app/data/products";
-
+import { useRouter } from "next/navigation";
 export default function ProductPage({
   params,
 }: {
@@ -20,6 +20,7 @@ export default function ProductPage({
   // find product
   const product = products.find((p) => p.id === id);
 
+  const router = useRouter();
   //  fallback if not found
   if (!product) {
     return <p className="p-6 text-red-500">Product not found</p>;
@@ -84,11 +85,15 @@ export default function ProductPage({
             </button>
 
             {/* BUY NOW */}
-            <button
-              className="border border-white text-white py-2 px-4 rounded-lg hover:bg-white hover:text-black active:scale-95 transition cursor-pointer"
-            >
-              Buy Now
-            </button>
+<button
+  onClick={() => {
+    // 🚀 Navigate to checkout with product id in URL
+    router.push(`/checkout?product=${product.id}`);
+  }}
+  className="border border-white text-white py-2 px-4 rounded-lg hover:bg-white hover:text-black active:scale-95 transition cursor-pointer"
+>
+  Buy Now
+</button>
 
           </div>
 
