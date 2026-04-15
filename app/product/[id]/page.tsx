@@ -1,48 +1,41 @@
 "use client";
 
-import { use, useState } from "react";
+import { use, useState } from "react"; // ✅ IMPORTANT
 import { useCart } from "@/app/context/CartContext";
 import { products } from "@/app/data/products";
 import { useRouter } from "next/navigation";
+
 export default function ProductPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>; // ✅ it's a Promise in your setup
 }) {
   const { addToCart } = useCart();
+  const router = useRouter();
 
-  // toast message
   const [message, setMessage] = useState("");
 
-  // get product id from URL
+  // ✅ FIX: unwrap params
   const { id } = use(params);
 
-  // find product
   const product = products.find((p) => p.id === id);
 
-  const router = useRouter();
-  //  fallback if not found
   if (!product) {
     return <p className="p-6 text-red-500">Product not found</p>;
   }
 
-  // clean add to cart function
   const handleAddToCart = () => {
-    if (message) return; // prevent spam
+    if (message) return;
 
     addToCart(product);
 
     setMessage(`✅ ${product.name} added to cart`);
-
-    setTimeout(() => {
-      setMessage("");
-    }, 2000);
+    setTimeout(() => setMessage(""), 2000);
   };
 
   return (
     <div className="max-w-6xl mx-auto p-8">
 
-      {/* TOAST */}
       {message && (
         <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
           {message}
@@ -52,7 +45,7 @@ export default function ProductPage({
       <div className="grid md:grid-cols-2 gap-10">
 
         {/* IMAGE */}
-        <div className="bg-white rounded-xl p-6 shadow hover:shadow-xl transition">
+        <div className="bg-white rounded-xl p-6 shadow">
           <img
             src={product.image}
             alt={product.name}
@@ -73,27 +66,23 @@ export default function ProductPage({
             {product.description}
           </p>
 
-          {/* BUTTONS */}
           <div className="flex gap-4 mt-4">
 
-            {/* ADD TO CART */}
             <button
               onClick={handleAddToCart}
-              className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
+              className="bg-black text-white py-2 px-4 rounded-lg"
             >
               Add to Cart
             </button>
 
-            {/* BUY NOW */}
-<button
-  onClick={() => {
-    // 🚀 Navigate to checkout with product id in URL
-    router.push(`/checkout?product=${product.id}`);
-  }}
-  className="border border-white text-white py-2 px-4 rounded-lg hover:bg-white hover:text-black active:scale-95 transition cursor-pointer"
->
-  Buy Now
-</button>
+            <button
+              onClick={() =>
+                router.push(`/checkout?product=${product.id}`)
+              }
+              className="border border-white text-white py-2 px-4 rounded-lg hover:bg-white hover:text-black"
+            >
+              Buy Now
+            </button>
 
           </div>
 
