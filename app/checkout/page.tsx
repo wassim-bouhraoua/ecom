@@ -4,8 +4,8 @@ import { useCart } from "@/app/context/CartContext";
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { products } from "@/app/data/products";
-
-export default function CheckoutPage() {
+import { Suspense } from "react";
+function CheckoutContent() {
   const { cart, getTotal, clearCart } = useCart();
   const router = useRouter();
 
@@ -161,8 +161,16 @@ export default function CheckoutPage() {
             <span>${total}</span>
           </div>
         </div>
-
+        
       </div>
     </div>
+  );
+}
+ 
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<p className="p-8">Loading...</p>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
