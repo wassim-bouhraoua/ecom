@@ -25,7 +25,6 @@ export const products = [ //fake database
     description: "Noise-cancelling headphones with great sound.",
   },
 
-  // 🔥 NEW PRODUCTS
   {
     id: "tablet",
     name: "Tablet",

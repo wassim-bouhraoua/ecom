@@ -6,8 +6,11 @@ import { useCart } from "@/app/context/CartContext";
 
 export default function Home() {
   const { addToCart } = useCart();
+
+  // ✅ toast message
   const [message, setMessage] = useState("");
 
+  // 🛒 featured products
   const featuredProducts = [
     {
       id: "phone",
@@ -32,17 +35,30 @@ export default function Home() {
     },
   ];
 
+  // 🧠 clean add to cart
+  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (message) return;
+
+    addToCart(product);
+
+    setMessage(`✅ ${product.name} added to cart`);
+
+    setTimeout(() => setMessage(""), 2000);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-20">
 
-      {/* ✅ TOAST MESSAGE */}
+      {/* ✅ TOAST */}
       {message && (
         <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
           {message}
         </div>
       )}
 
-      {/* 🔥 HERO SECTION */}
+      {/* HERO */}
       <div className="grid md:grid-cols-2 gap-10 items-center">
 
         {/* LEFT */}
@@ -55,7 +71,6 @@ export default function Home() {
             Discover amazing products at unbeatable prices.
           </p>
 
-          {/* CTA BUTTONS */}
           <div className="flex gap-4">
             <Link
               href="/product"
@@ -66,13 +81,13 @@ export default function Home() {
 
             <Link
               href="/cart"
-              className="border px-6 py-3 rounded-lg hover:bg-gray-100"
+              className="border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-black transition"
             >
               View Cart
             </Link>
           </div>
 
-          {/* TRUST BADGES */}
+          {/* TRUST */}
           <div className="flex gap-6 text-sm text-gray-400 pt-4">
             <p>✅ Free Shipping</p>
             <p>🔒 Secure Payment</p>
@@ -90,7 +105,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🔥 FEATURED PRODUCTS */}
+      {/* FEATURED */}
       <div>
         <h2 className="text-2xl font-bold mb-6">
           🔥 Featured Products
@@ -116,21 +131,8 @@ export default function Home() {
                     ${product.price}
                   </p>
 
-                  {/* ADD TO CART */}
                   <button
-                    onClick={(e) => {
-                      e.preventDefault();
-
-                      if (message) return;
-
-                      addToCart(product);
-
-                      setMessage(`✅ ${product.name} added to cart`);
-
-                      setTimeout(() => {
-                        setMessage("");
-                      }, 2000);
-                    }}
+                    onClick={(e) => handleAddToCart(product, e)}
                     className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
                   >
                     Add to Cart

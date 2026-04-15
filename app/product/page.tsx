@@ -7,35 +7,46 @@ import { products } from "@/app/data/products";
 
 export default function Page() {
   const { addToCart } = useCart();
-  const [message, setMessage] = useState("");
+
+  //  filters state
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
 
+  //  toast message
+  const [message, setMessage] = useState("");
+
+  //  dynamic categories
   const categories = ["all", ...new Set(products.map(p => p.category))];
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
-    const matchesCategory =
-      category === "all" || product.category === category;
-
-    const matchesMin =
-      minPrice === "" || product.price >= Number(minPrice);
-
-    const matchesMax =
-      maxPrice === "" || product.price <= Number(maxPrice);
-
-    return matchesSearch && matchesCategory && matchesMin && matchesMax;
+  //  filter function 
+  const filteredProducts = products.filter((p) => {
+    return (
+      p.name.toLowerCase().includes(search.toLowerCase()) &&
+      (category === "all" || p.category === category) &&
+      (!minPrice || p.price >= Number(minPrice)) &&
+      (!maxPrice || p.price <= Number(maxPrice))
+    );
   });
+
+  // clean add to cart
+  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+    e.preventDefault(); // prevent Link navigation
+
+    if (message) return;
+
+    addToCart(product);
+
+    setMessage(`✅ ${product.name} added to cart`);
+
+    setTimeout(() => setMessage(""), 2000);
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-6">
 
-      {/* ✅ TOAST MESSAGE */}
+      {/*  TOAST */}
       {message && (
         <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
           {message}
@@ -53,14 +64,15 @@ export default function Page() {
         className="w-full px-4 py-2 rounded-lg border"
       />
 
-      {/* FILTER */}
+      {/* FILTER BAR */}
       <div className="flex flex-wrap gap-4 items-center">
 
-        <div className="relative inline-block">
+        {/* CATEGORY */}
+        <div className="relative">
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="px-4 py-2 pr-10 rounded-lg bg-black text-white border border-gray-600 appearance-none cursor-pointer"
+            className="px-4 py-2 pr-10 rounded-lg bg-black text-white border border-gray-600 appearance-none"
           >
             {categories.map((cat) => (
               <option key={cat} value={cat}>
@@ -74,30 +86,32 @@ export default function Page() {
           </span>
         </div>
 
+        {/* PRICE */}
         <input
           type="number"
-          placeholder="Min Price"
+          placeholder="Min"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
-          className="px-4 py-2 border rounded-lg w-32"
+          className="px-4 py-2 border rounded-lg w-28"
         />
 
         <input
           type="number"
-          placeholder="Max Price"
+          placeholder="Max"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
-          className="px-4 py-2 border rounded-lg w-32"
+          className="px-4 py-2 border rounded-lg w-28"
         />
 
+        {/* RESET */}
         <button
           onClick={() => {
+            setSearch("");
             setCategory("all");
             setMinPrice("");
             setMaxPrice("");
-            setSearch("");
           }}
-          className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
+          className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 active:scale-95 transition"
         >
           Reset
         </button>
@@ -115,26 +129,15 @@ export default function Page() {
                 className="w-full h-48 object-cover"
               />
 
-              <div className="p-4">
+              <div className="p-4 space-y-2">
                 <p className="font-semibold text-lg">{product.name}</p>
                 <p className="text-gray-500">
                   ${product.price.toFixed(2)}
                 </p>
 
+                {/* ADD TO CART */}
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-
-                    if (message) return;
-
-                    addToCart(product);
-
-                    setMessage(`✅ ${product.name} added to cart`);
-
-                    setTimeout(() => {
-                      setMessage("");
-                    }, 2000);
-                  }}
+                  onClick={(e) => handleAddToCart(product, e)}
                   className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
                 >
                   Add to Cart
@@ -147,10 +150,10 @@ export default function Page() {
         ))}
       </div>
 
+      {/* EMPTY */}
       {filteredProducts.length === 0 && (
         <p className="text-gray-500">No products found.</p>
       )}
-
     </div>
   );
 }
