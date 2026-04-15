@@ -7,10 +7,8 @@ import { useCart } from "@/app/context/CartContext";
 export default function Home() {
   const { addToCart } = useCart();
 
-  // ✅ toast message
   const [message, setMessage] = useState("");
 
-  // 🛒 featured products
   const featuredProducts = [
     {
       id: "phone",
@@ -35,94 +33,112 @@ export default function Home() {
     },
   ];
 
-  // 🧠 clean add to cart
   const handleAddToCart = (product: any, e: React.MouseEvent) => {
     e.preventDefault();
 
     if (message) return;
 
     addToCart(product);
-
     setMessage(`✅ ${product.name} added to cart`);
 
     setTimeout(() => setMessage(""), 2000);
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8 space-y-20">
+    <div className="max-w-6xl mx-auto px-6 py-10 space-y-24">
 
-      {/* ✅ TOAST */}
+      {/* TOAST */}
       {message && (
-        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in">
           {message}
         </div>
       )}
 
       {/* HERO */}
-      <div className="grid md:grid-cols-2 gap-10 items-center">
+      <div className="grid md:grid-cols-2 gap-12 items-center">
 
         {/* LEFT */}
         <div className="space-y-6">
-          <h1 className="text-4xl md:text-5xl font-bold">
-            🛍️ My Store
+
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
+            Shop Smart.
+            <br />
+            Shop Fast.
           </h1>
 
-          <p className="text-gray-400 text-lg">
-            Discover amazing products at unbeatable prices.
+          <p className="text-gray-400 text-lg max-w-md">
+            Discover high-quality tech products at unbeatable prices.
+            Fast delivery, secure checkout, and great experience.
           </p>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 pt-2">
+
             <Link
               href="/product"
-              className="bg-white text-black px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition"
+              className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:scale-105 transition"
             >
-              Shop Now
+              Shop Now →
             </Link>
 
             <Link
               href="/cart"
-              className="border border-white text-white px-6 py-3 rounded-lg hover:bg-white hover:text-black transition"
+              className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition"
             >
               View Cart
             </Link>
+
           </div>
 
           {/* TRUST */}
-          <div className="flex gap-6 text-sm text-gray-400 pt-4">
-            <p>✅ Free Shipping</p>
+          <div className="flex gap-6 text-sm text-gray-400 pt-6">
+            <p>🚚 Free Shipping</p>
             <p>🔒 Secure Payment</p>
             <p>⚡ Fast Delivery</p>
           </div>
+
         </div>
 
-        {/* RIGHT IMAGE */}
-        <div className="relative">
+        {/* RIGHT */}
+        <div className="relative group">
           <img
             src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9"
-            className="rounded-xl shadow-lg"
+            className="rounded-2xl shadow-xl group-hover:scale-105 transition duration-300"
           />
-          <div className="absolute inset-0 bg-black/20 rounded-xl" />
+          <div className="absolute inset-0 bg-black/30 rounded-2xl" />
         </div>
+
       </div>
 
       {/* FEATURED */}
-      <div>
-        <h2 className="text-2xl font-bold mb-6">
-          🔥 Featured Products
-        </h2>
+      <div className="space-y-6">
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-bold">
+            Featured Products
+          </h2>
+
+          <Link
+            href="/product"
+            className="text-sm text-gray-400 hover:text-white transition"
+          >
+            View all →
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+
           {featuredProducts.map((product) => (
             <Link key={product.id} href={`/product/${product.id}`}>
 
-              <div className="bg-white text-black rounded-xl overflow-hidden shadow hover:shadow-xl hover:scale-[1.02] transition cursor-pointer">
+              <div className="bg-white text-black rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:scale-[1.03] transition cursor-pointer">
 
                 <img
                   src={product.image}
-                  className="h-48 w-full object-cover"
+                  className="h-52 w-full object-cover"
                 />
 
-                <div className="p-4 space-y-2">
+                <div className="p-5 space-y-3">
+
                   <p className="font-semibold text-lg">
                     {product.name}
                   </p>
@@ -133,17 +149,20 @@ export default function Home() {
 
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 active:scale-95 transition cursor-pointer"
+                    className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 active:scale-95 transition"
                   >
                     Add to Cart
                   </button>
+
                 </div>
 
               </div>
 
             </Link>
           ))}
+
         </div>
+
       </div>
 
     </div>

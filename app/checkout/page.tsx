@@ -64,7 +64,13 @@ function CheckoutContent() {
 
     setTimeout(() => {
       // 💾 save correct order (cart OR buy now)
-      localStorage.setItem("lastOrder", JSON.stringify(itemsToShow));
+    const orderData = {
+  id: Math.random().toString(36).substring(2, 8).toUpperCase(), // random ID
+  date: new Date().toLocaleDateString(), // today's date
+  items: itemsToShow,
+};
+
+localStorage.setItem("lastOrder", JSON.stringify(orderData));
 
       clearCart();
 
