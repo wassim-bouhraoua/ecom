@@ -67,14 +67,6 @@ npm run dev
 
 ---
 
-## 🚀 Deployment
-
-Deployed using Vercel:
-
-👉 https://learning-bice.vercel.app
-
----
-
 ## 👨‍💻 Author
 
 * GitHub: https://github.com/wassim-bouhraoua
