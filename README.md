@@ -35,44 +35,29 @@ Browse products, view details, and manage your cart — all in a clean and simpl
 ```
 app/
  ├── cart/
- ├── product/
- │   ├── [id]/
  │   └── page.tsx
+ ├── checkout/
+ │   └── page.tsx
+ ├── components/
+ │   └── Navbar.tsx
  ├── context/
- └── layout.tsx
+ │   └── CartContext.tsx
+ ├── data/
+ │   └── products.ts
+ ├── orders/
+ │   └── page.tsx
+ ├── product/
+ │   └── page.tsx
+ ├── thank-you/
+ │   └── page.tsx
+ ├── favicon.ico
+ ├── globals.css
+ ├── layout.tsx
+ └── page.tsx
 ```
-
----
-
-## ⚙️ Getting Started (Local)
-
-Clone the project:
-
-```
-git clone https://github.com/wassim-bouhraoua/learning.git
-cd learning
-```
-
-Install dependencies:
-
-```
-npm install
-```
-
-Run the development server:
-
-```
-npm run dev
-```
-
----
-
 ## 👨‍💻 Author
 
 * GitHub: https://github.com/wassim-bouhraoua
 
 ---
 
-## ⭐️ Show your support
-
-If you like this project, give it a ⭐️ on GitHub!
