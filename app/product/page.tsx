@@ -47,12 +47,23 @@ export default function Page() {
     <div className="max-w-6xl mx-auto p-8 space-y-6">
 
       {/*  TOAST */}
-      {message && (
-        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          {message}
-        </div>
-      )}
+   {message && (
+  <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
+    <div className="bg-white text-black px-5 py-3 rounded-full shadow-lg flex items-center gap-3 animate-fade-in border border-gray-200">
 
+      {/* ICON */}
+      <div className="w-6 h-6 flex items-center justify-center rounded-full bg-green-100">
+        <span className="text-green-600 text-sm">✔</span>
+      </div>
+
+      {/* TEXT */}
+      <span className="text-sm font-medium">
+        {message}
+      </span>
+
+    </div>
+  </div>
+)}
       <h1 className="text-3xl font-bold">Products</h1>
 
       {/* SEARCH */}

@@ -1,12 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
   const [orders, setOrders] = useState<any[]>([]);
 
+  // 🔐 protect page
+useEffect(() => {
+  if (!loading && !user) {
+    router.push("/login");
+  }
+}, [user, loading, router]);
+
+  // 📦 load user-specific orders
   useEffect(() => {
-    const saved = localStorage.getItem("orders");
+    if (!user) return;
+
+    const saved = localStorage.getItem(`orders_${user.name}`);
 
     if (saved) {
       const parsed = JSON.parse(saved);
@@ -17,13 +32,22 @@ export default function OrdersPage() {
       }));
 
       setOrders(withStatus);
+    } else {
+      setOrders([]);
     }
-  }, []);
+  }, [user]);
 
+  // 🗑 delete order (per user)
   const deleteOrder = (id: string) => {
     const updated = orders.filter((o) => o.id !== id);
     setOrders(updated);
-    localStorage.setItem("orders", JSON.stringify(updated));
+
+    if (user) {
+      localStorage.setItem(
+        `orders_${user.name}`,
+        JSON.stringify(updated)
+      );
+    }
   };
 
   const getStatusStyle = (status: string) => {
@@ -34,6 +58,10 @@ export default function OrdersPage() {
     if (status === "Delivered")
       return "bg-green-100 text-green-700";
   };
+
+  // ⛔ prevent flash
+ if (loading) return null; // wait for auth
+if (!user) return null;  // then protect
 
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
@@ -72,7 +100,6 @@ export default function OrdersPage() {
 
                 <p className="font-bold">${total}</p>
 
-                {/* DELETE */}
                 <button
                   onClick={() => deleteOrder(order.id)}
                   className="text-red-500 text-sm hover:underline"

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { useAuth } from "@/app/context/AuthContext"; // ✅ NEW
 
 // Product type
 type Product = {
@@ -10,12 +11,12 @@ type Product = {
   image: string;
 };
 
-// Cart item = product + quantity
+// Cart item
 type CartItem = Product & {
   quantity: number;
 };
 
-// What we share across the app
+// Context type
 type CartContextType = {
   cart: CartItem[];
   addToCart: (product: Product) => void;
@@ -25,31 +26,41 @@ type CartContextType = {
   getTotal: () => number;
 };
 
-// Create global cart
 const CartContext = createContext<CartContextType | null>(null);
 
-// Provider wraps the app
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth(); // ✅ NEW
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Load cart from localStorage (once)
-  useEffect(() => {
-    const saved = localStorage.getItem("cart");
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
+  // 🔑 get key per user
+  const getCartKey = () => {
+    return user ? `cart_${user.name}` : "cart_guest";
+  };
 
-  // Save cart whenever it changes
+  // 📦 load cart when user changes
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
+    const key = getCartKey();
+    const saved = localStorage.getItem(key);
 
-  // Add item to cart
+    if (saved) {
+      setCart(JSON.parse(saved));
+    } else {
+      setCart([]);
+    }
+  }, [user]);
+
+  // 💾 save cart when it changes
+  useEffect(() => {
+    const key = getCartKey();
+    localStorage.setItem(key, JSON.stringify(cart));
+  }, [cart, user]);
+
+  // ➕ add item
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const exists = prev.find((item) => item.id === product.id);
 
       if (exists) {
-        // increase quantity
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
@@ -57,12 +68,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         );
       }
 
-      // add new product
       return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  // Decrease quantity
+  // ➖ decrease
   const decreaseQuantity = (id: string) => {
     setCart((prev) =>
       prev
@@ -71,19 +81,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
-        .filter((item) => item.quantity > 0) // remove if 0
+        .filter((item) => item.quantity > 0)
     );
   };
 
-  // Remove item completely
+  // ❌ remove
   const removeFromCart = (id: string) => {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Clear cart
+  // 🧹 clear
   const clearCart = () => setCart([]);
 
-  // Calculate total price
+  // 💰 total
   const getTotal = () => {
     return cart.reduce(
       (total, item) => total + item.price * item.quantity,
@@ -91,7 +101,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  // Provide cart to all components
   return (
     <CartContext.Provider
       value={{
@@ -108,7 +117,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Hook to use cart anywhere
 export function useCart() {
   const context = useContext(CartContext);
 

@@ -1,13 +1,15 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
-import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext"; 
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { products } from "@/app/data/products";
 import { Suspense } from "react";
 
 function CheckoutContent() {
   const { cart, getTotal, clearCart } = useCart();
+  const { user } = useAuth(); 
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -31,6 +33,39 @@ function CheckoutContent() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+useEffect(() => {
+  if (!user) return;
+
+  const pending = localStorage.getItem("pendingOrder");
+
+  if (pending) {
+    const parsed = JSON.parse(pending);
+
+    const newOrder = {
+      id: Math.random().toString(36).substring(2, 8).toUpperCase(),
+      date: new Date().toLocaleDateString(),
+      items: parsed.items,
+      status: "Pending",
+    };
+
+    const existingOrders = JSON.parse(
+      localStorage.getItem(`orders_${user.name}`) || "[]"
+    );
+
+    localStorage.setItem(
+      `orders_${user.name}`,
+      JSON.stringify([newOrder, ...existingOrders])
+    );
+
+    localStorage.setItem("lastOrder", JSON.stringify(newOrder));
+
+    localStorage.removeItem("pendingOrder");
+
+    clearCart();
+
+    router.push("/thank-you");
+  }
+}, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -49,25 +84,41 @@ function CheckoutContent() {
       return;
     }
 
+    // 🔐 user must be logged in
+    if (!user) {
+  // 💾 save pending order
+  localStorage.setItem(
+    "pendingOrder",
+    JSON.stringify({
+      items: itemsToShow,
+      total,
+    })
+  );
+
+  router.push("/login");
+  return;
+}
     setError("");
     setLoading(true);
 
     const newOrder = {
       id: Math.random().toString(36).substring(2, 8).toUpperCase(),
       date: new Date().toLocaleDateString(),
-      items: itemsToShow, 
-      status: "Pending", 
+      items: itemsToShow,
+      status: "Pending",
     };
 
+    // ✅ per-user storage
     const existingOrders = JSON.parse(
-      localStorage.getItem("orders") || "[]"
+      localStorage.getItem(`orders_${user.name}`) || "[]"
     );
 
     localStorage.setItem(
-      "orders",
+      `orders_${user.name}`,
       JSON.stringify([newOrder, ...existingOrders])
     );
 
+    // ✅ for thank-you page
     localStorage.setItem("lastOrder", JSON.stringify(newOrder));
 
     clearCart();
@@ -82,7 +133,8 @@ function CheckoutContent() {
       <h1 className="text-3xl font-bold mb-10">Checkout</h1>
 
       <div className="grid md:grid-cols-2 gap-10">
-        {/* FORM */}
+
+        {/* LEFT: FORM */}
         <div className="space-y-6">
           <h2 className="text-xl font-semibold">Shipping Details</h2>
 
@@ -125,9 +177,13 @@ function CheckoutContent() {
           </button>
         </div>
 
-        {/* SUMMARY */}
+        {/* RIGHT: SUMMARY */}
         <div className="bg-white text-black rounded-xl p-6 shadow space-y-4">
           <h2 className="text-xl font-semibold">Order Summary</h2>
+
+          {itemsToShow.length === 0 && (
+            <p className="text-gray-500">No items</p>
+          )}
 
           {itemsToShow.map((item) => (
             <div key={item.id} className="flex justify-between text-sm">
@@ -145,6 +201,7 @@ function CheckoutContent() {
             <span>${total}</span>
           </div>
         </div>
+
       </div>
     </div>
   );
