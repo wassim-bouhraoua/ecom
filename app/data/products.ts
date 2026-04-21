@@ -13,11 +13,11 @@ export const products: Product[] = [
     id: "phone",
     name: "Phone",
     category: "phone",
-    price: 300,
+    price: 0,
     image:
       "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500",
     description: "A powerful smartphone with modern features.",
-    stock: 0,
+    stock: 8,
   },
   {
     id: "laptop",
