@@ -1,12 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
-import { products } from "@/app/data/products";
+import { products, Product } from "@/app/data/products";
 
 export default function Page() {
   const { addToCart } = useCart();
+
+  // 🔥 LOAD PRODUCTS (sync with localStorage)
+  const [list, setList] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const stored =
+      JSON.parse(localStorage.getItem("products") || "null") || products;
+
+    setList(stored);
+  }, []);
 
   // 🔍 filters state
   const [search, setSearch] = useState("");
@@ -18,10 +28,10 @@ export default function Page() {
   const [message, setMessage] = useState("");
 
   // 📦 categories
-  const categories = ["all", ...new Set(products.map(p => p.category))];
+  const categories = ["all", ...new Set(list.map((p) => p.category))];
 
-  // 🔍 filter logic (UNCHANGED)
-  const filteredProducts = products.filter((p) => {
+  // 🔍 FILTER LOGIC (NOW USES list)
+  const filteredProducts = list.filter((p: Product) => {
     return (
       p.name.toLowerCase().includes(search.toLowerCase()) &&
       (category === "all" || p.category === category) &&
@@ -30,11 +40,11 @@ export default function Page() {
     );
   });
 
-  // 🛒 add to cart (FIXED)
-  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+  // 🛒 add to cart
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (product.stock === 0) return; // 🚫 prevent
+    if (product.stock === 0) return;
 
     addToCart(product);
 
@@ -121,7 +131,7 @@ export default function Page() {
 
       {/* 🧱 GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
+        {filteredProducts.map((product: Product) => (
           <Link key={product.id} href={`/product/${product.id}`}>
 
             <div className="bg-white text-black rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition duration-300 group cursor-pointer">
@@ -147,7 +157,7 @@ export default function Page() {
                   ${product.price.toFixed(2)}
                 </p>
 
-                {/* ✅ STOCK */}
+                {/* STOCK */}
                 <p
                   className={`text-xs font-medium ${
                     product.stock > 0
@@ -160,7 +170,7 @@ export default function Page() {
                     : "Out of stock"}
                 </p>
 
-                {/* ✅ BUTTON */}
+                {/* BUTTON */}
                 <button
                   onClick={(e) => handleAddToCart(product, e)}
                   disabled={product.stock === 0}

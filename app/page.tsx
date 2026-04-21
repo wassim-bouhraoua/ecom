@@ -1,45 +1,35 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
+import { products, type Product } from "@/app/data/products";
 
 export default function Home() {
   const { addToCart } = useCart();
 
   const [message, setMessage] = useState("");
+  const [list, setList] = useState<Product[]>([]);
 
-  const featuredProducts = [
-    {
-      id: "phone",
-      name: "Phone",
-      price: 300,
-      image:
-        "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9",
-    },
-    {
-      id: "laptop",
-      name: "Laptop",
-      price: 1000,
-      image:
-        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8",
-    },
-    {
-      id: "headphones",
-      name: "Headphones",
-      price: 100,
-      image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500",
-    },
-  ];
+  // 🔥 load products (with updated stock)
+  useEffect(() => {
+    const stored =
+      JSON.parse(localStorage.getItem("products") || "null") || products;
 
-  const handleAddToCart = (product: any, e: React.MouseEvent) => {
+    setList(stored);
+  }, []);
+
+  // 🎯 pick first 3 as featured
+  const featuredProducts = list.slice(0, 3);
+
+  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
 
     if (message) return;
+    if (product.stock === 0) return;
 
     addToCart(product);
-    setMessage(`✅ ${product.name} added to cart`);
+    setMessage(`${product.name} added to cart`);
 
     setTimeout(() => setMessage(""), 2000);
   };
@@ -49,7 +39,7 @@ export default function Home() {
 
       {/* TOAST */}
       {message && (
-        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fade-in">
+        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
           {message}
         </div>
       )}
@@ -57,9 +47,7 @@ export default function Home() {
       {/* HERO */}
       <div className="grid md:grid-cols-2 gap-12 items-center">
 
-        {/* LEFT */}
         <div className="space-y-6">
-
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
             Shop Smart.
             <br />
@@ -72,7 +60,6 @@ export default function Home() {
           </p>
 
           <div className="flex gap-4 pt-2">
-
             <Link
               href="/product"
               className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:scale-105 transition"
@@ -86,27 +73,22 @@ export default function Home() {
             >
               View Cart
             </Link>
-
           </div>
 
-          {/* TRUST */}
           <div className="flex gap-6 text-sm text-gray-400 pt-6">
             <p>🚚 Free Shipping</p>
             <p>🔒 Secure Payment</p>
             <p>⚡ Fast Delivery</p>
           </div>
-
         </div>
 
-        {/* RIGHT */}
         <div className="relative group">
           <img
-            src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9"
+            src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600"
             className="rounded-2xl shadow-xl group-hover:scale-105 transition duration-300"
           />
           <div className="absolute inset-0 bg-black/30 rounded-2xl" />
         </div>
-
       </div>
 
       {/* FEATURED */}
@@ -147,11 +129,30 @@ export default function Home() {
                     ${product.price}
                   </p>
 
+                  {/* ✅ STOCK */}
+                  <p
+                    className={`text-xs font-medium ${
+                      product.stock > 0
+                        ? "text-green-500"
+                        : "text-red-500"
+                    }`}
+                  >
+                    {product.stock > 0
+                      ? `✔ In stock (${product.stock})`
+                      : "Out of stock"}
+                  </p>
+
+                  {/* ✅ BUTTON */}
                   <button
                     onClick={(e) => handleAddToCart(product, e)}
-                    className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 active:scale-95 transition"
+                    disabled={product.stock === 0}
+                    className={`w-full py-2 rounded-lg transition ${
+                      product.stock > 0
+                        ? "bg-black text-white hover:bg-gray-800"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                   >
-                    Add to Cart
+                    {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
                   </button>
 
                 </div>
