@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/app/context/CartContext";
-import { AuthProvider } from "@/app/context/AuthContext"; 
+import { AuthProvider } from "@/app/context/AuthContext";
 import Navbar from "@/app/components/Navbar";
+import InitProducts from "./components/InitProducts";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,6 +35,9 @@ export default function RootLayout({
 
         <AuthProvider>
           <CartProvider>
+
+            {/* 🔥 THIS RUNS ON CLIENT SAFELY */}
+            <InitProducts />
 
             <Navbar />
             <main className="flex-1">{children}</main>
