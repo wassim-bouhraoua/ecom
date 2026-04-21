@@ -89,13 +89,12 @@ export const products: Product[] = [
           stock: 7,
     },
     {
-      id: "monitor",
-      name: "Monitor",
-      category: "laptop",
-      price: 400,
-      image:
-        "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf",
-      description: "Full HD monitor perfect for work and gaming.",
-          stock: 3,
-    },,
+  id: "monitor",
+  name: "Monitor",
+  category: "laptop",
+  price: 400,
+  image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf",
+  description: "Full HD monitor perfect for work and gaming.",
+  stock: 3,
+}
 ];
