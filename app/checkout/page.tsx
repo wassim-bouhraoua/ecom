@@ -1,7 +1,7 @@
 "use client";
 
 import { useCart } from "@/app/context/CartContext";
-import { useAuth } from "@/app/context/AuthContext"; 
+import { useAuth } from "@/app/context/AuthContext";
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { products } from "@/app/data/products";
@@ -9,7 +9,7 @@ import { Suspense } from "react";
 
 function CheckoutContent() {
   const { cart, getTotal, clearCart } = useCart();
-  const { user } = useAuth(); 
+  const { user } = useAuth();
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -33,39 +33,60 @@ function CheckoutContent() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-useEffect(() => {
-  if (!user) return;
 
-  const pending = localStorage.getItem("pendingOrder");
+  // 🔐 HANDLE PENDING ORDER AFTER LOGIN
+  useEffect(() => {
+    if (!user) return;
 
-  if (pending) {
-    const parsed = JSON.parse(pending);
+    const pending = localStorage.getItem("pendingOrder");
 
-    const newOrder = {
-      id: Math.random().toString(36).substring(2, 8).toUpperCase(),
-      date: new Date().toLocaleDateString(),
-      items: parsed.items,
-      status: "Pending",
-    };
+    if (pending) {
+      const parsed = JSON.parse(pending);
 
-    const existingOrders = JSON.parse(
-      localStorage.getItem(`orders_${user.name}`) || "[]"
-    );
+      const newOrder = {
+        id: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        date: new Date().toLocaleDateString(),
+        items: parsed.items,
+        status: "Pending",
+      };
 
-    localStorage.setItem(
-      `orders_${user.name}`,
-      JSON.stringify([newOrder, ...existingOrders])
-    );
+      const existingOrders = JSON.parse(
+        localStorage.getItem(`orders_${user.name}`) || "[]"
+      );
 
-    localStorage.setItem("lastOrder", JSON.stringify(newOrder));
+      localStorage.setItem(
+        `orders_${user.name}`,
+        JSON.stringify([newOrder, ...existingOrders])
+      );
 
-    localStorage.removeItem("pendingOrder");
+      localStorage.setItem("lastOrder", JSON.stringify(newOrder));
 
-    clearCart();
+      // ✅ UPDATE STOCK (FIXED)
+      const storedProducts =
+        JSON.parse(localStorage.getItem("products") || "null") ||
+        products;
 
-    router.push("/thank-you");
-  }
-}, [user]);
+      const updatedProducts = storedProducts.map((p: any) => {
+        const found = parsed.items.find((i: any) => i.id === p.id);
+
+        if (found) {
+          return {
+            ...p,
+            stock: Math.max(p.stock - found.quantity, 0),
+          };
+        }
+
+        return p;
+      });
+
+      localStorage.setItem("products", JSON.stringify(updatedProducts));
+
+      localStorage.removeItem("pendingOrder");
+      clearCart();
+
+      router.push("/thank-you");
+    }
+  }, [user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
@@ -84,20 +105,20 @@ useEffect(() => {
       return;
     }
 
-    // 🔐 user must be logged in
+    // 🔐 REQUIRE LOGIN
     if (!user) {
-  // 💾 save pending order
-  localStorage.setItem(
-    "pendingOrder",
-    JSON.stringify({
-      items: itemsToShow,
-      total,
-    })
-  );
+      localStorage.setItem(
+        "pendingOrder",
+        JSON.stringify({
+          items: itemsToShow,
+          total,
+        })
+      );
 
-  router.push("/login");
-  return;
-}
+      router.push("/login");
+      return;
+    }
+
     setError("");
     setLoading(true);
 
@@ -108,7 +129,6 @@ useEffect(() => {
       status: "Pending",
     };
 
-    // ✅ per-user storage
     const existingOrders = JSON.parse(
       localStorage.getItem(`orders_${user.name}`) || "[]"
     );
@@ -118,8 +138,27 @@ useEffect(() => {
       JSON.stringify([newOrder, ...existingOrders])
     );
 
-    // ✅ for thank-you page
     localStorage.setItem("lastOrder", JSON.stringify(newOrder));
+
+    // ✅ UPDATE STOCK (NORMAL FLOW)
+    const storedProducts =
+      JSON.parse(localStorage.getItem("products") || "null") ||
+      products;
+
+    const updatedProducts = storedProducts.map((p: any) => {
+      const found = itemsToShow.find((i) => i.id === p.id);
+
+      if (found) {
+        return {
+          ...p,
+          stock: Math.max(p.stock - found.quantity, 0),
+        };
+      }
+
+      return p;
+    });
+
+    localStorage.setItem("products", JSON.stringify(updatedProducts));
 
     clearCart();
 
@@ -134,7 +173,7 @@ useEffect(() => {
 
       <div className="grid md:grid-cols-2 gap-10">
 
-        {/* LEFT: FORM */}
+        {/* FORM */}
         <div className="space-y-6">
           <h2 className="text-xl font-semibold">Shipping Details</h2>
 
@@ -177,7 +216,7 @@ useEffect(() => {
           </button>
         </div>
 
-        {/* RIGHT: SUMMARY */}
+        {/* SUMMARY */}
         <div className="bg-white text-black rounded-xl p-6 shadow space-y-4">
           <h2 className="text-xl font-semibold">Order Summary</h2>
 
