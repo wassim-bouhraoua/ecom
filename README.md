@@ -32,14 +32,14 @@ Browse products, view details, and manage your cart — all in a clean and simpl
 
 ## 📁 Project Structure
 
-```
 app/
  ├── cart/
  │   └── page.tsx
  ├── checkout/
  │   └── page.tsx
  ├── components/
- │   └── Navbar.tsx
+ │   ├── Navbar.tsx
+ │   └── InitProducts.tsx   
  ├── context/
  │   └── CartContext.tsx
  ├── data/
@@ -47,9 +47,13 @@ app/
  ├── orders/
  │   └── page.tsx
  ├── product/
- │   └── page.tsx
+ │   ├── [id]/              
+ │   │   └── page.tsx       
+ │   └── page.tsx          
  ├── thank-you/
  │   └── page.tsx
+ ├── public/
+ │   └── placeholder.png    
  ├── favicon.ico
  ├── globals.css
  ├── layout.tsx
