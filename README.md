@@ -59,5 +59,3 @@ app/
 ├── globals.css
 ├── layout.tsx
 └── page.tsx
-## 👨‍💻 Author
- GitHub: https://github.com/wassim-bouhraoua
