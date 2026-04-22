@@ -3,33 +3,21 @@
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
 import { useAuth } from "@/app/context/AuthContext";
-import { useState, useEffect } from "react";
-import { ShoppingCart } from "lucide-react";
+import { useState } from "react";
+
 import { ThemeToggle } from "@/app/components/common/ThemeToggle";
+import CartDrawer from "@/app/components/CartDrawer";
 
 export default function Navbar() {
   const { cart } = useCart();
   const { user, logout } = useAuth();
 
   const [open, setOpen] = useState(false);
-  const [animate, setAnimate] = useState(false);
 
   const totalItems = cart.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
-
-  useEffect(() => {
-    if (cart.length === 0) return;
-
-    setAnimate(true);
-
-    const timeout = setTimeout(() => {
-      setAnimate(false);
-    }, 300);
-
-    return () => clearTimeout(timeout);
-  }, [cart]);
 
   return (
     <div className="w-full border-b bg-background text-foreground sticky top-0 z-50">
@@ -54,23 +42,8 @@ export default function Navbar() {
           {/* 🌗 THEME TOGGLE */}
           <ThemeToggle />
 
-          {/* 🛒 CART */}
-          <Link
-            href="/cart"
-            className="relative flex items-center hover:opacity-70 transition"
-          >
-            <ShoppingCart
-              className={`w-6 h-6 transition-transform duration-300 ${
-                animate ? "scale-125 rotate-12" : ""
-              }`}
-            />
-
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-                {totalItems}
-              </span>
-            )}
-          </Link>
+          {/* 🛒 CART DRAWER (FIXED) */}
+          <CartDrawer />
 
           {/* 👤 USER */}
           <div className="relative">

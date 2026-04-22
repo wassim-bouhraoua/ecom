@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-// ✅ shadcn
+// shadcn
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -31,93 +31,102 @@ export default function ThankYouPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-background">
 
-      <div className="w-full max-w-2xl space-y-8 text-center">
+      <Card className="w-full max-w-2xl shadow-xl border">
+        <CardContent className="p-8 space-y-8 text-center">
 
-        {/* 🎉 ICON */}
-        <div className="text-6xl">🎉</div>
-
-        {/* TITLE */}
-        <div>
-          <h1 className="text-3xl font-bold">
-            Order Placed Successfully!
-          </h1>
-          <p className="text-muted-foreground mt-2">
-            Thank you for your purchase
-          </p>
-        </div>
-
-        {/* 🧾 ORDER INFO */}
-        {order && (
-          <div className="text-sm text-muted-foreground space-y-1">
-            <p>
-              Order ID:{" "}
-              <span className="font-semibold text-foreground">
-                {order.id}
-              </span>
-            </p>
-            <p>Date: {order.date}</p>
+          {/* 🎉 SUCCESS ICON */}
+          <div className="flex justify-center">
+            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+              <span className="text-3xl">✅</span>
+            </div>
           </div>
-        )}
 
-        {/* 📦 ORDER SUMMARY */}
-        <Card>
-          <CardContent className="p-6 space-y-4 text-left">
+          {/* TITLE */}
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold">
+              Order Confirmed
+            </h1>
+            <p className="text-muted-foreground">
+              Your order has been placed successfully 🎉
+            </p>
+          </div>
 
-            <h2 className="text-xl font-semibold">
-              Order Summary
-            </h2>
+          {/* ORDER INFO */}
+          {order && (
+            <div className="text-sm text-muted-foreground space-y-1">
+              <p>
+                Order ID:{" "}
+                <span className="font-semibold text-foreground">
+                  #{order.id}
+                </span>
+              </p>
+              <p>{order.date}</p>
+            </div>
+          )}
 
-            {/* ITEMS */}
+          <Separator />
+
+          {/* ITEMS */}
+          <div className="space-y-3 text-left">
+
             {order?.items?.length === 0 ? (
-              <p className="text-muted-foreground">No items</p>
+              <p className="text-muted-foreground text-center">
+                No items
+              </p>
             ) : (
               order?.items?.map((item: any) => (
                 <div
                   key={item.id}
-                  className="flex justify-between text-sm"
+                  className="flex justify-between items-center text-sm"
                 >
-                  <span>
+                  <span className="font-medium">
                     {item.name} × {item.quantity}
                   </span>
 
-                  <span>
+                  <span className="text-muted-foreground">
                     ${item.price * item.quantity}
                   </span>
                 </div>
               ))
             )}
 
-            <Separator />
+          </div>
 
-            {/* TOTAL */}
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total</span>
-              <span>${total}</span>
-            </div>
+          <Separator />
 
-          </CardContent>
-        </Card>
+          {/* TOTAL */}
+          <div className="flex justify-between items-center text-lg font-semibold">
+            <span>Total</span>
+            <span>${total}</span>
+          </div>
 
-        {/* BUTTONS */}
-        <div className="flex justify-center gap-4">
+          {/* ACTIONS */}
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
 
-          <Button asChild size="lg">
-            <Link href="/product">
-              Continue Shopping
-            </Link>
-          </Button>
+            <Button asChild size="lg" className="w-full">
+              <Link href="/product">
+                Continue Shopping
+              </Link>
+            </Button>
 
-          <Button asChild variant="outline" size="lg">
-            <Link href="/">
-              Go Home
-            </Link>
-          </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="w-full"
+            >
+              <Link href="/">
+                Go Home
+              </Link>
+            </Button>
 
-        </div>
+          </div>
 
-      </div>
+        </CardContent>
+      </Card>
+
     </div>
   );
 }

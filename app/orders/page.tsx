@@ -4,6 +4,12 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 
+// shadcn
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+
 export default function OrdersPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -11,13 +17,13 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
 
   // 🔐 protect page
-useEffect(() => {
-  if (!loading && !user) {
-    router.push("/login");
-  }
-}, [user, loading, router]);
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push("/login");
+    }
+  }, [user, loading, router]);
 
-  // 📦 load user-specific orders
+  // 📦 load orders
   useEffect(() => {
     if (!user) return;
 
@@ -37,7 +43,6 @@ useEffect(() => {
     }
   }, [user]);
 
-  // 🗑 delete order (per user)
   const deleteOrder = (id: string) => {
     const updated = orders.filter((o) => o.id !== id);
     setOrders(updated);
@@ -50,25 +55,24 @@ useEffect(() => {
     }
   };
 
-  const getStatusStyle = (status: string) => {
-    if (status === "Pending")
-      return "bg-yellow-100 text-yellow-700";
-    if (status === "Shipped")
-      return "bg-blue-100 text-blue-700";
-    if (status === "Delivered")
-      return "bg-green-100 text-green-700";
+  const getStatusVariant = (status: string) => {
+    if (status === "Pending") return "secondary";
+    if (status === "Shipped") return "default";
+    if (status === "Delivered") return "outline";
+    return "secondary";
   };
 
-  // ⛔ prevent flash
- if (loading) return null; // wait for auth
-if (!user) return null;  // then protect
+  if (loading || !user) return null;
 
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
+
       <h1 className="text-3xl font-bold">Your Orders</h1>
 
       {orders.length === 0 && (
-        <p className="text-gray-500">No orders yet</p>
+        <p className="text-muted-foreground">
+          No orders yet 😢
+        </p>
       )}
 
       {orders.map((order) => {
@@ -79,52 +83,64 @@ if (!user) return null;  // then protect
         );
 
         return (
-          <div
-            key={order.id}
-            className="bg-white text-black rounded-xl p-6 shadow space-y-4"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <p className="font-semibold">Order #{order.id}</p>
-                <p className="text-sm text-gray-500">{order.date}</p>
+          <Card key={order.id} className="shadow-sm">
+            <CardContent className="p-6 space-y-4">
+
+              {/* HEADER */}
+              <div className="flex justify-between items-center">
+
+                <div>
+                  <p className="font-semibold">
+                    Order #{order.id}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {order.date}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3">
+
+                  <Badge variant={getStatusVariant(order.status)}>
+                    {order.status}
+                  </Badge>
+
+                  <p className="font-semibold">
+                    ${total}
+                  </p>
+
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => deleteOrder(order.id)}
+                  >
+                    Delete
+                  </Button>
+
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <span
-                  className={`px-3 py-1 text-xs rounded-full font-semibold ${getStatusStyle(
-                    order.status
-                  )}`}
-                >
-                  {order.status}
-                </span>
+              <Separator />
 
-                <p className="font-bold">${total}</p>
+              {/* ITEMS */}
+              <div className="space-y-2">
+                {order.items?.map((item: any) => (
+                  <div
+                    key={item.id}
+                    className="flex justify-between text-sm"
+                  >
+                    <span>
+                      {item.name} × {item.quantity}
+                    </span>
 
-                <button
-                  onClick={() => deleteOrder(order.id)}
-                  className="text-red-500 text-sm hover:underline"
-                >
-                  Delete
-                </button>
+                    <span className="text-muted-foreground">
+                      ${item.price * item.quantity}
+                    </span>
+                  </div>
+                ))}
               </div>
-            </div>
 
-            <hr />
-
-            {order.items?.map((item: any) => (
-              <div
-                key={item.id}
-                className="flex justify-between text-sm"
-              >
-                <span>
-                  {item.name} × {item.quantity}
-                </span>
-                <span>
-                  ${item.price * item.quantity}
-                </span>
-              </div>
-            ))}
-          </div>
+            </CardContent>
+          </Card>
         );
       })}
     </div>
