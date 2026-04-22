@@ -5,13 +5,19 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { products, type Product } from "@/app/data/products";
 
+// ✅ shadcn
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+// ✅ toast
+import { toast } from "sonner";
+
 export default function Home() {
   const { addToCart } = useCart();
 
-  const [message, setMessage] = useState("");
   const [list, setList] = useState<Product[]>([]);
 
-  // 🔥 load products (with updated stock)
+  // 🔥 load products
   useEffect(() => {
     const stored =
       JSON.parse(localStorage.getItem("products") || "null") || products;
@@ -19,30 +25,23 @@ export default function Home() {
     setList(stored);
   }, []);
 
-  // 🎯 pick first 3 as featured
+  // 🎯 featured
   const featuredProducts = list.slice(0, 3);
 
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (message) return;
-    if (product.stock === 0) return;
+    if (product.stock === 0) {
+      toast.error("Out of stock ❌");
+      return;
+    }
 
     addToCart(product);
-    setMessage(`${product.name} added to cart`);
-
-    setTimeout(() => setMessage(""), 2000);
+    toast.success(`${product.name} added to cart 🛒`);
   };
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 space-y-24">
-
-      {/* TOAST */}
-      {message && (
-        <div className="fixed top-5 right-5 bg-black text-white px-4 py-2 rounded-lg shadow-lg z-50">
-          {message}
-        </div>
-      )}
 
       {/* HERO */}
       <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -54,28 +53,33 @@ export default function Home() {
             Shop Fast.
           </h1>
 
-          <p className="text-gray-400 text-lg max-w-md">
+          <p className="text-muted-foreground text-lg max-w-md">
             Discover high-quality tech products at unbeatable prices.
             Fast delivery, secure checkout, and great experience.
           </p>
 
           <div className="flex gap-4 pt-2">
-            <Link
-              href="/product"
-              className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:scale-105 transition"
-            >
-              Shop Now →
-            </Link>
 
-            <Link
-              href="/cart"
-              className="border border-white px-6 py-3 rounded-xl hover:bg-white hover:text-black transition"
+            <Button asChild size="lg" className="rounded-full px-6">
+              <Link href="/product">
+                Shop Now →
+              </Link>
+            </Button>
+
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="rounded-full px-6"
             >
-              View Cart
-            </Link>
+              <Link href="/cart">
+                View Cart
+              </Link>
+            </Button>
+
           </div>
 
-          <div className="flex gap-6 text-sm text-gray-400 pt-6">
+          <div className="flex gap-6 text-sm text-muted-foreground pt-6">
             <p>🚚 Free Shipping</p>
             <p>🔒 Secure Payment</p>
             <p>⚡ Fast Delivery</p>
@@ -101,7 +105,7 @@ export default function Home() {
 
           <Link
             href="/product"
-            className="text-sm text-gray-400 hover:text-white transition"
+            className="text-sm text-muted-foreground hover:underline"
           >
             View all →
           </Link>
@@ -112,52 +116,52 @@ export default function Home() {
           {featuredProducts.map((product) => (
             <Link key={product.id} href={`/product/${product.id}`}>
 
-              <div className="bg-white text-black rounded-2xl overflow-hidden shadow-md hover:shadow-2xl hover:scale-[1.03] transition cursor-pointer">
+              <Card className="overflow-hidden hover:shadow-xl hover:scale-[1.03] transition cursor-pointer group">
+                <CardContent className="p-0">
 
-                <img
-                  src={product.image}
-                  className="h-52 w-full object-cover"
-                />
+                  <img
+                    src={product.image}
+                    className="h-52 w-full object-cover group-hover:scale-105 transition"
+                  />
 
-                <div className="p-5 space-y-3">
+                  <div className="p-5 space-y-3">
 
-                  <p className="font-semibold text-lg">
-                    {product.name}
-                  </p>
+                    <p className="font-semibold text-lg">
+                      {product.name}
+                    </p>
 
-                  <p className="text-gray-500">
-                    ${product.price}
-                  </p>
+                    <p className="text-muted-foreground">
+                      ${product.price}
+                    </p>
 
-                  {/* ✅ STOCK */}
-                  <p
-                    className={`text-xs font-medium ${
-                      product.stock > 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {product.stock > 0
-                      ? `✔ In stock (${product.stock})`
-                      : "Out of stock"}
-                  </p>
+                    {/* STOCK */}
+                    <p
+                      className={`text-xs font-medium ${
+                        product.stock > 0
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
+                    >
+                      {product.stock > 0
+                        ? `✔ In stock (${product.stock})`
+                        : "Out of stock"}
+                    </p>
 
-                  {/* ✅ BUTTON */}
-                  <button
-                    onClick={(e) => handleAddToCart(product, e)}
-                    disabled={product.stock === 0}
-                    className={`w-full py-2 rounded-lg transition ${
-                      product.stock > 0
-                        ? "bg-black text-white hover:bg-gray-800"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
-                  >
-                    {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
-                  </button>
+                    {/* BUTTON */}
+                    <Button
+                      onClick={(e) => handleAddToCart(product, e)}
+                      disabled={product.stock === 0}
+                      className="w-full"
+                    >
+                      {product.stock > 0
+                        ? "Add to Cart"
+                        : "Out of Stock"}
+                    </Button>
 
-                </div>
+                  </div>
 
-              </div>
+                </CardContent>
+              </Card>
 
             </Link>
           ))}

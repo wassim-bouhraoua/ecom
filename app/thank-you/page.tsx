@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+// ✅ shadcn
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
 export default function ThankYouPage() {
   const [order, setOrder] = useState<any>(null);
   const [total, setTotal] = useState(0);
@@ -15,7 +20,6 @@ export default function ThankYouPage() {
 
       setOrder(parsed);
 
-      // ✅ FIX: use parsed.items (NOT parsed)
       const totalPrice = parsed.items.reduce(
         (sum: number, item: any) =>
           sum + item.price * item.quantity,
@@ -39,17 +43,17 @@ export default function ThankYouPage() {
           <h1 className="text-3xl font-bold">
             Order Placed Successfully!
           </h1>
-          <p className="text-gray-400 mt-2">
+          <p className="text-muted-foreground mt-2">
             Thank you for your purchase
           </p>
         </div>
 
         {/* 🧾 ORDER INFO */}
         {order && (
-          <div className="text-sm text-gray-400 space-y-1">
+          <div className="text-sm text-muted-foreground space-y-1">
             <p>
               Order ID:{" "}
-              <span className="text-white font-semibold">
+              <span className="font-semibold text-foreground">
                 {order.id}
               </span>
             </p>
@@ -58,56 +62,58 @@ export default function ThankYouPage() {
         )}
 
         {/* 📦 ORDER SUMMARY */}
-        <div className="bg-white text-black rounded-xl p-6 shadow space-y-4 text-left">
+        <Card>
+          <CardContent className="p-6 space-y-4 text-left">
 
-          <h2 className="text-xl font-semibold">Order Summary</h2>
+            <h2 className="text-xl font-semibold">
+              Order Summary
+            </h2>
 
-          {/* ITEMS */}
-          {order?.items?.length === 0 ? (
-            <p className="text-gray-500">No items</p>
-          ) : (
-            order?.items?.map((item: any) => (
-              <div
-                key={item.id}
-                className="flex justify-between"
-              >
-                <span>
-                  {item.name} × {item.quantity}
-                </span>
+            {/* ITEMS */}
+            {order?.items?.length === 0 ? (
+              <p className="text-muted-foreground">No items</p>
+            ) : (
+              order?.items?.map((item: any) => (
+                <div
+                  key={item.id}
+                  className="flex justify-between text-sm"
+                >
+                  <span>
+                    {item.name} × {item.quantity}
+                  </span>
 
-                <span>
-                  ${item.price * item.quantity}
-                </span>
-              </div>
-            ))
-          )}
+                  <span>
+                    ${item.price * item.quantity}
+                  </span>
+                </div>
+              ))
+            )}
 
-          <hr />
+            <Separator />
 
-          {/* TOTAL */}
-          <div className="flex justify-between font-bold text-lg">
-            <span>Total</span>
-            <span>${total}</span>
-          </div>
+            {/* TOTAL */}
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total</span>
+              <span>${total}</span>
+            </div>
 
-        </div>
+          </CardContent>
+        </Card>
 
         {/* BUTTONS */}
         <div className="flex justify-center gap-4">
 
-          <Link
-            href="/product"
-            className="bg-white text-black px-6 py-3 rounded-lg hover:bg-gray-200 transition"
-          >
-            Continue Shopping
-          </Link>
+          <Button asChild size="lg">
+            <Link href="/product">
+              Continue Shopping
+            </Link>
+          </Button>
 
-          <Link
-            href="/"
-            className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-black transition"
-          >
-            Go Home
-          </Link>
+          <Button asChild variant="outline" size="lg">
+            <Link href="/">
+              Go Home
+            </Link>
+          </Button>
 
         </div>
 

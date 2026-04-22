@@ -2,10 +2,18 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useAuth } from "@/app/context/AuthContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { products } from "@/app/data/products";
-import { Suspense } from "react";
+
+// ✅ shadcn
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+// ✅ toast
+import { toast } from "sonner";
 
 function CheckoutContent() {
   const { cart, getTotal, clearCart } = useCart();
@@ -21,9 +29,7 @@ function CheckoutContent() {
     ? [{ ...singleProduct, quantity: 1 }]
     : cart;
 
-  const total = singleProduct
-    ? singleProduct.price
-    : getTotal();
+  const total = singleProduct ? singleProduct.price : getTotal();
 
   const [form, setForm] = useState({
     name: "",
@@ -31,7 +37,6 @@ function CheckoutContent() {
     card: "",
   });
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   // 🔐 HANDLE PENDING ORDER AFTER LOGIN
@@ -61,7 +66,7 @@ function CheckoutContent() {
 
       localStorage.setItem("lastOrder", JSON.stringify(newOrder));
 
-      // ✅ UPDATE STOCK (FIXED)
+      // update stock
       const storedProducts =
         JSON.parse(localStorage.getItem("products") || "null") ||
         products;
@@ -101,11 +106,10 @@ function CheckoutContent() {
     const { name, address, card } = form;
 
     if (!name || !address || !card) {
-      setError("⚠️ Please fill all fields");
+      toast.error("Please fill all fields ⚠️");
       return;
     }
 
-    // 🔐 REQUIRE LOGIN
     if (!user) {
       localStorage.setItem(
         "pendingOrder",
@@ -119,7 +123,6 @@ function CheckoutContent() {
       return;
     }
 
-    setError("");
     setLoading(true);
 
     const newOrder = {
@@ -140,7 +143,7 @@ function CheckoutContent() {
 
     localStorage.setItem("lastOrder", JSON.stringify(newOrder));
 
-    // ✅ UPDATE STOCK (NORMAL FLOW)
+    // update stock
     const storedProducts =
       JSON.parse(localStorage.getItem("products") || "null") ||
       products;
@@ -168,80 +171,83 @@ function CheckoutContent() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-10">Checkout</h1>
+    <div className="max-w-6xl mx-auto p-8 space-y-8">
+
+      <h1 className="text-3xl font-bold">Checkout</h1>
 
       <div className="grid md:grid-cols-2 gap-10">
 
         {/* FORM */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-semibold">Shipping Details</h2>
+        <Card>
+          <CardContent className="p-6 space-y-6">
 
-          {error && (
-            <div className="bg-red-100 text-red-700 p-3 rounded-lg">
-              {error}
-            </div>
-          )}
+            <h2 className="text-xl font-semibold">Shipping Details</h2>
 
-          <input
-            name="name"
-            placeholder="Full Name"
-            value={form.name}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-lg bg-transparent"
-          />
+            <Input
+              name="name"
+              placeholder="Full Name"
+              value={form.name}
+              onChange={handleChange}
+            />
 
-          <input
-            name="address"
-            placeholder="Address"
-            value={form.address}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-lg bg-transparent"
-          />
+            <Input
+              name="address"
+              placeholder="Address"
+              value={form.address}
+              onChange={handleChange}
+            />
 
-          <input
-            name="card"
-            placeholder="Card Number"
-            value={form.card}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border rounded-lg bg-transparent"
-          />
+            <Input
+              name="card"
+              placeholder="Card Number"
+              value={form.card}
+              onChange={handleChange}
+            />
 
-          <button
-            onClick={handleCheckout}
-            disabled={loading}
-            className="w-full bg-white text-black py-3 rounded-lg font-semibold disabled:opacity-50"
-          >
-            {loading ? "Processing..." : "Place Order"}
-          </button>
-        </div>
+            <Button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full"
+            >
+              {loading ? "Processing..." : "Place Order"}
+            </Button>
+
+          </CardContent>
+        </Card>
 
         {/* SUMMARY */}
-        <div className="bg-white text-black rounded-xl p-6 shadow space-y-4">
-          <h2 className="text-xl font-semibold">Order Summary</h2>
+        <Card>
+          <CardContent className="p-6 space-y-4">
 
-          {itemsToShow.length === 0 && (
-            <p className="text-gray-500">No items</p>
-          )}
+            <h2 className="text-xl font-semibold">Order Summary</h2>
 
-          {itemsToShow.map((item) => (
-            <div key={item.id} className="flex justify-between text-sm">
-              <div>
-                {item.name} × {item.quantity}
+            {itemsToShow.length === 0 && (
+              <p className="text-muted-foreground">No items</p>
+            )}
+
+            {itemsToShow.map((item) => (
+              <div key={item.id} className="flex justify-between text-sm">
+                <span>
+                  {item.name} × {item.quantity}
+                </span>
+                <span>
+                  ${item.price * item.quantity}
+                </span>
               </div>
-              <div>${item.price * item.quantity}</div>
+            ))}
+
+            <Separator />
+
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total</span>
+              <span>${total}</span>
             </div>
-          ))}
 
-          <hr />
-
-          <div className="flex justify-between font-bold text-lg">
-            <span>Total</span>
-            <span>${total}</span>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
       </div>
+
     </div>
   );
 }
