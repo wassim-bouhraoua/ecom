@@ -16,8 +16,9 @@ export default function Home() {
   const { addToCart } = useCart();
 
   const [list, setList] = useState<Product[]>([]);
+  const [indexes, setIndexes] = useState<Record<string, number>>({}); // ✅ slider per product
 
-  // ✅ FIX: safe loading
+  // load products
   useEffect(() => {
     const stored =
       JSON.parse(localStorage.getItem("products") || "null") || products;
@@ -25,9 +26,8 @@ export default function Home() {
     setList(stored);
   }, []);
 
-  // ✅ FIX: fallback to products if empty
-  const featuredProducts =
-    (list.length ? list : products).slice(0, 3);
+  // featured products
+  const featuredProducts = list.slice(0, 3);
 
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,6 +50,7 @@ export default function Home() {
 
       {/* HERO */}
       <div className="grid md:grid-cols-2 gap-12 items-center">
+
         <div className="space-y-6">
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight">
             Shop Smart.
@@ -62,6 +63,7 @@ export default function Home() {
           </p>
 
           <div className="flex gap-4 pt-2">
+
             <Button asChild size="lg">
               <Link href="/product">Shop Now →</Link>
             </Button>
@@ -69,17 +71,19 @@ export default function Home() {
             <Button asChild variant="outline" size="lg">
               <Link href="/cart">View Cart</Link>
             </Button>
+
           </div>
         </div>
 
         <img
           src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600"
-          className="rounded-2xl"
+          className="rounded-2xl shadow-xl"
         />
       </div>
 
       {/* FEATURED */}
       <div className="space-y-6">
+
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-bold">Featured Products</h2>
 
@@ -90,62 +94,108 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
 
-          {featuredProducts.map((product) => (
-            <Link key={product.id} href={`/product/${product.id}`}>
+          {featuredProducts.map((product) => {
+            const currentIndex = indexes[product.id] ?? 0;
 
-              <Card className="overflow-hidden hover:shadow-xl transition cursor-pointer group">
-                <CardContent className="p-0">
+            return (
+              <Link key={product.id} href={`/product/${product.id}`}>
 
-                  {/* ✅ FIX: SAFE IMAGE */}
-                  <img
-                    src={product.images?.[0] || "/placeholder.png"}
-                    alt={product.name}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/placeholder.png";
-                    }}
-                    className="h-52 w-full object-cover"
-                  />
+                <Card className="overflow-hidden group cursor-pointer">
+                  <CardContent className="p-0">
 
-                  <div className="p-5 space-y-3">
-                    <p className="font-semibold text-lg">
-                      {product.name}
-                    </p>
+                    {/* ✅ IMAGE SLIDER */}
+                    <div className="relative">
 
-                    <p className="text-muted-foreground">
-                      ${product.price}
-                    </p>
+                      <img
+                        src={
+                          product.images?.[currentIndex] ||
+                          "/placeholder.png"
+                        }
+                        className="h-52 w-full object-cover"
+                      />
 
-                    <p
-                      className={`text-xs ${
-                        product.stock > 0
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {product.stock > 0
-                        ? `✔ In stock (${product.stock})`
-                        : "Out of stock"}
-                    </p>
+                      {/* LEFT */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
 
-                    <Button
-                      onClick={(e) => handleAddToCart(product, e)}
-                      disabled={product.stock === 0}
-                      className="w-full"
-                    >
-                      {product.stock > 0
-                        ? "Add to Cart"
-                        : "Out of Stock"}
-                    </Button>
-                  </div>
+                          setIndexes((prev) => ({
+                            ...prev,
+                            [product.id]:
+                              currentIndex === 0
+                                ? product.images.length - 1
+                                : currentIndex - 1,
+                          }));
+                        }}
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 rounded"
+                      >
+                        ◀
+                      </button>
 
-                </CardContent>
-              </Card>
+                      {/* RIGHT */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
 
-            </Link>
-          ))}
+                          setIndexes((prev) => ({
+                            ...prev,
+                            [product.id]:
+                              currentIndex === product.images.length - 1
+                                ? 0
+                                : currentIndex + 1,
+                          }));
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-2 rounded"
+                      >
+                        ▶
+                      </button>
+
+                    </div>
+
+                    {/* INFO */}
+                    <div className="p-5 space-y-3">
+
+                      <p className="font-semibold text-lg">
+                        {product.name}
+                      </p>
+
+                      <p>${product.price}</p>
+
+                      <p
+                        className={`text-xs ${
+                          product.stock > 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {product.stock > 0
+                          ? `✔ In stock (${product.stock})`
+                          : "Out of stock"}
+                      </p>
+
+                      <Button
+                        onClick={(e) => handleAddToCart(product, e)}
+                        disabled={product.stock === 0}
+                        className="w-full"
+                      >
+                        {product.stock > 0
+                          ? "Add to Cart"
+                          : "Out of Stock"}
+                      </Button>
+
+                    </div>
+
+                  </CardContent>
+                </Card>
+
+              </Link>
+            );
+          })}
 
         </div>
+
       </div>
 
     </div>
