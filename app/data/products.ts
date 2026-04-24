@@ -9,14 +9,14 @@ export type Product = {
   stock: number;
 };
 
-// ✅ helper (auto-load 3 images per product)
+// ✅ helper
 const getProductImages = (id: string) => [
   `/products/${id}/${id}1.webp`,
   `/products/${id}/${id}2.webp`,
   `/products/${id}/${id}3.webp`,
 ];
 
-// ✅ products
+// ✅ products (FIXED)
 export const products: Product[] = [
   {
     id: "phone",
@@ -37,20 +37,20 @@ export const products: Product[] = [
     stock: 9,
   },
   {
-    id: "sony",
+    id: "headphones", // ✅ FIXED (was sony)
     name: "Headphones",
     category: "audio",
     price: 100,
-    images: getProductImages("sony"),
+    images: getProductImages("headphones"),
     description: "Noise-cancelling headphones with great sound.",
     stock: 15,
   },
   {
-    id: "tablette",
+    id: "tablet", // ✅ FIXED (was tablette)
     name: "Tablet",
     category: "phone",
     price: 500,
-    images: getProductImages("tablette"),
+    images: getProductImages("tablet"),
     description: "Portable tablet for entertainment and work.",
     stock: 7,
   },
