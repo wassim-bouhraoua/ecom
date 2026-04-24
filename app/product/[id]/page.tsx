@@ -1,28 +1,27 @@
 "use client";
 
-import { use, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { products, type Product } from "@/app/data/products";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 
-// ✅ shadcn
+// shadcn
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-// ✅ toast
+// toast
 import { toast } from "sonner";
 
-export default function ProductPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ProductPage() {
   const { addToCart } = useCart();
   const router = useRouter();
 
-  const [product, setProduct] = useState<Product | null>(null);
+  // ✅ FIX: get params correctly
+  const params = useParams();
+  const id = params.id as string;
 
-  const { id } = use(params);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [index, setIndex] = useState(0); // slider index
 
   useEffect(() => {
     const stored =
@@ -33,11 +32,7 @@ export default function ProductPage({
   }, [id]);
 
   if (!product) {
-    return (
-      <p className="p-6 text-muted-foreground">
-        Product not found
-      </p>
-    );
+    return <p className="p-6">Product not found</p>;
   }
 
   const handleAddToCart = () => {
@@ -46,7 +41,11 @@ export default function ProductPage({
       return;
     }
 
-    addToCart(product);
+    addToCart({
+      ...product,
+      image: product.images?.[0],
+    });
+
     toast.success(`${product.name} added to cart 🛒`);
   };
 
@@ -55,23 +54,47 @@ export default function ProductPage({
 
       <div className="grid md:grid-cols-2 gap-10">
 
-        {/* IMAGE */}
+        {/* IMAGE SLIDER */}
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-6 relative">
+
             <img
-              src={product.image}
+              src={product.images?.[index] || "/placeholder.png"}
               alt={product.name}
               className="w-full h-80 object-contain"
             />
+
+            {/* LEFT */}
+            <button
+              onClick={() =>
+                setIndex((prev) =>
+                  prev === 0 ? product.images.length - 1 : prev - 1
+                )
+              }
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded"
+            >
+              ◀
+            </button>
+
+            {/* RIGHT */}
+            <button
+              onClick={() =>
+                setIndex((prev) =>
+                  prev === product.images.length - 1 ? 0 : prev + 1
+                )
+              }
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white px-3 py-1 rounded"
+            >
+              ▶
+            </button>
+
           </CardContent>
         </Card>
 
         {/* INFO */}
         <div className="flex flex-col gap-4">
 
-          <h1 className="text-3xl font-bold">
-            {product.name}
-          </h1>
+          <h1 className="text-3xl font-bold">{product.name}</h1>
 
           <p className="text-2xl font-semibold">
             ${product.price}
@@ -83,10 +106,8 @@ export default function ProductPage({
 
           {/* STOCK */}
           <p
-            className={`text-sm font-medium ${
-              product.stock > 0
-                ? "text-green-500"
-                : "text-red-500"
+            className={`text-sm ${
+              product.stock > 0 ? "text-green-500" : "text-red-500"
             }`}
           >
             {product.stock > 0
@@ -94,17 +115,16 @@ export default function ProductPage({
               : "Out of stock"}
           </p>
 
+          {/* ACTIONS */}
           <div className="flex gap-4 mt-4">
 
-            {/* ADD TO CART */}
             <Button
               onClick={handleAddToCart}
               disabled={product.stock === 0}
             >
-              {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+              Add to Cart
             </Button>
 
-            {/* BUY NOW */}
             <Button
               variant="outline"
               onClick={() =>

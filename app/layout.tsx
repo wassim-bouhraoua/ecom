@@ -7,7 +7,6 @@ import { AuthProvider } from "@/app/context/AuthContext";
 import Navbar from "@/app/components/Navbar";
 import InitProducts from "./components/InitProducts";
 
-// ✅ add this
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -37,14 +36,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
 
-        {/* ✅ THIS IS THE FIX */}
         <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-        >
+  attribute="class"
+  defaultTheme="dark"
+  enableSystem={false}
+  disableTransitionOnChange
+>
 
           <AuthProvider>
             <CartProvider>
@@ -54,7 +53,6 @@ export default function RootLayout({
 
               <main className="flex-1">{children}</main>
 
-              {/* ✅ toaster should be inside ThemeProvider */}
               <Toaster />
 
             </CartProvider>

@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { products, Product } from "@/app/data/products";
+import ProductCard from "@/app/components/ProductCard";
 
 // ✅ shadcn
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 // ✅ toast
 import { toast } from "sonner";
@@ -52,7 +50,11 @@ export default function Page() {
       return;
     }
 
-    addToCart(product);
+    addToCart({
+      ...product,
+      image: product.images?.[0] || "/placeholder.png",
+    });
+
     toast.success(`${product.name} added to cart 🛒`);
   };
 
@@ -118,63 +120,11 @@ export default function Page() {
       {/* 🧱 GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredProducts.map((product: Product) => (
-          <Link key={product.id} href={`/product/${product.id}`}>
-
-            <Card className="overflow-hidden hover:shadow-xl transition group cursor-pointer">
-              <CardContent className="p-0">
-
-                {/* IMAGE */}
-                <div className="overflow-hidden">
-                  <img
-                    src={product.image}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://via.placeholder.com/300";
-                    }}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition"
-                  />
-                </div>
-
-                {/* INFO */}
-                <div className="p-4 space-y-3">
-
-                  <div className="flex justify-between items-center">
-                    <p className="font-semibold text-lg">{product.name}</p>
-                    <Badge variant="secondary">{product.category}</Badge>
-                  </div>
-
-                  <p className="text-muted-foreground">
-                    ${product.price.toFixed(2)}
-                  </p>
-
-                  {/* STOCK */}
-                  <p
-                    className={`text-xs font-medium ${
-                      product.stock > 0
-                        ? "text-green-500"
-                        : "text-red-500"
-                    }`}
-                  >
-                    {product.stock > 0
-                      ? `✔ In stock (${product.stock})`
-                      : "Out of stock"}
-                  </p>
-
-                  {/* BUTTON */}
-                  <Button
-                    onClick={(e) => handleAddToCart(product, e)}
-                    disabled={product.stock === 0}
-                    className="w-full"
-                  >
-                    {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
-                  </Button>
-
-                </div>
-
-              </CardContent>
-            </Card>
-
-          </Link>
+          <ProductCard
+            key={product.id}
+            product={product}
+            handleAddToCart={handleAddToCart}
+          />
         ))}
       </div>
 
