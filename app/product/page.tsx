@@ -1,30 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useCart } from "@/app/context/CartContext";
 import { products, Product } from "@/app/data/products";
 import ProductCard from "@/app/components/ProductCard";
 
-// ✅ shadcn
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-// ✅ toast
 import { toast } from "sonner";
 
 export default function Page() {
   const { addToCart } = useCart();
 
-  const [list, setList] = useState<Product[]>([]);
+  const list = products;
 
-  useEffect(() => {
-    const stored =
-      JSON.parse(localStorage.getItem("products") || "null") || products;
-
-    setList(stored);
-  }, []);
-
-  // 🔍 filters
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [minPrice, setMinPrice] = useState("");
@@ -41,7 +30,6 @@ export default function Page() {
     );
   });
 
-  // 🛒 add to cart
   const handleAddToCart = (product: Product, e: React.MouseEvent) => {
     e.preventDefault();
 
@@ -60,20 +48,15 @@ export default function Page() {
 
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-6">
-
       <h1 className="text-3xl font-bold">Products</h1>
 
-      {/* 🔍 SEARCH */}
       <Input
         placeholder="Search products..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
-      {/* 🎯 FILTER BAR */}
       <div className="flex flex-wrap gap-4 items-center">
-
-        {/* CATEGORY */}
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -86,7 +69,6 @@ export default function Page() {
           ))}
         </select>
 
-        {/* PRICE */}
         <Input
           type="number"
           placeholder="Min"
@@ -103,7 +85,6 @@ export default function Page() {
           className="w-28"
         />
 
-        {/* RESET */}
         <Button
           variant="outline"
           onClick={() => {
@@ -117,7 +98,6 @@ export default function Page() {
         </Button>
       </div>
 
-      {/* 🧱 GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {filteredProducts.map((product: Product) => (
           <ProductCard
@@ -128,7 +108,6 @@ export default function Page() {
         ))}
       </div>
 
-      {/* EMPTY */}
       {filteredProducts.length === 0 && (
         <p className="text-muted-foreground text-center py-10">
           No products found 😢

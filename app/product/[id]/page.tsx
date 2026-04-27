@@ -16,18 +16,15 @@ export default function ProductPage() {
   const { addToCart } = useCart();
   const router = useRouter();
 
-  // ✅ FIX: get params correctly
   const params = useParams();
   const id = params.id as string;
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [index, setIndex] = useState(0); // slider index
+  const [index, setIndex] = useState(0);
 
+  // ✅ ALWAYS use products.ts (single source of truth)
   useEffect(() => {
-    const stored =
-      JSON.parse(localStorage.getItem("products") || "null") || products;
-
-    const found = stored.find((p: Product) => p.id === id);
+    const found = products.find((p: Product) => p.id === id);
     setProduct(found || null);
   }, [id]);
 
@@ -43,7 +40,7 @@ export default function ProductPage() {
 
     addToCart({
       ...product,
-      image: product.images?.[0],
+      image: product.images?.[0] || "/placeholder.png",
     });
 
     toast.success(`${product.name} added to cart 🛒`);
@@ -51,13 +48,11 @@ export default function ProductPage() {
 
   return (
     <div className="max-w-6xl mx-auto p-8">
-
       <div className="grid md:grid-cols-2 gap-10">
 
         {/* IMAGE SLIDER */}
         <Card>
           <CardContent className="p-6 relative">
-
             <img
               src={product.images?.[index] || "/placeholder.png"}
               alt={product.name}
@@ -87,13 +82,11 @@ export default function ProductPage() {
             >
               ▶
             </button>
-
           </CardContent>
         </Card>
 
         {/* INFO */}
         <div className="flex flex-col gap-4">
-
           <h1 className="text-3xl font-bold">{product.name}</h1>
 
           <p className="text-2xl font-semibold">
@@ -117,7 +110,6 @@ export default function ProductPage() {
 
           {/* ACTIONS */}
           <div className="flex gap-4 mt-4">
-
             <Button
               onClick={handleAddToCart}
               disabled={product.stock === 0}
@@ -135,9 +127,7 @@ export default function ProductPage() {
             >
               Buy Now
             </Button>
-
           </div>
-
         </div>
 
       </div>

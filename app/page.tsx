@@ -16,14 +16,11 @@ export default function Home() {
   const { addToCart } = useCart();
 
   const [list, setList] = useState<Product[]>([]);
-  const [indexes, setIndexes] = useState<Record<string, number>>({}); // ✅ slider per product
+  const [indexes, setIndexes] = useState<Record<string, number>>({});
 
-  // load products
+  // ✅ FIXED: ALWAYS use fresh products (NO localStorage)
   useEffect(() => {
-    const stored =
-      JSON.parse(localStorage.getItem("products") || "null") || products;
-
-    setList(stored);
+    setList(products);
   }, []);
 
   // featured products
@@ -103,7 +100,7 @@ export default function Home() {
                 <Card className="overflow-hidden group cursor-pointer">
                   <CardContent className="p-0">
 
-                    {/* ✅ IMAGE SLIDER */}
+                    {/* IMAGE SLIDER */}
                     <div className="relative">
 
                       <img

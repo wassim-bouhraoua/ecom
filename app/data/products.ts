@@ -25,7 +25,7 @@ export const products: Product[] = [
     price: 300,
     images: getProductImages("phone"),
     description: "A powerful smartphone with modern features.",
-    stock: 0,
+    stock: 10,
   },
   {
     id: "laptop",
