@@ -2,8 +2,6 @@
 
 import Link from "next/link";
 import { useCart } from "@/app/context/CartContext";
-
-// shadcn
 import {
   Sheet,
   SheetContent,
@@ -32,7 +30,7 @@ export default function CartDrawer() {
 
   return (
     <Sheet>
-      {/* 🛒 Trigger (cart icon) */}
+      {/* 🛒 Trigger */}
       <SheetTrigger asChild>
         <button className="relative">
           <ShoppingCart className="w-6 h-6" />
@@ -45,7 +43,7 @@ export default function CartDrawer() {
         </button>
       </SheetTrigger>
 
-      {/* 📦 Drawer Content */}
+      {/* 📦 Drawer */}
       <SheetContent className="flex flex-col justify-between">
 
         <div>
@@ -61,9 +59,9 @@ export default function CartDrawer() {
               </p>
             )}
 
-            {cart.map((item) => (
+            {cart.map((item, index) => (
               <div
-                key={item.id}
+                key={index} // ✅ FIX (was item.id → breaks with variants)
                 className="flex items-center justify-between gap-3"
               >
                 {/* LEFT */}
@@ -77,9 +75,26 @@ export default function CartDrawer() {
                     <p className="text-sm font-medium">
                       {item.name}
                     </p>
+
                     <p className="text-xs text-muted-foreground">
                       ${item.price}
                     </p>
+
+                    {/* items details*/}
+                    {item.selectedOptions && (
+                      <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-1">
+                        {Object.entries(item.selectedOptions).map(
+                          ([key, value]) => (
+                            <span
+                              key={key}
+                              className="px-2 py-0.5 border rounded"
+                            >
+                              {key}: {value}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 

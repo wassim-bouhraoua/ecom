@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "@/app/context/AuthContext"; // ✅ NEW
+import { useAuth } from "@/app/context/AuthContext";
 
 // Product type
 type Product = {
@@ -9,6 +9,7 @@ type Product = {
   name: string;
   price: number;
   image: string;
+  selectedOptions?: Record<string, string>; // ✅ NEW
 };
 
 // Cart item
@@ -29,15 +30,13 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth(); // ✅ NEW
+  const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // 🔑 get key per user
   const getCartKey = () => {
     return user ? `cart_${user.name}` : "cart_guest";
   };
 
-  // 📦 load cart when user changes
   useEffect(() => {
     const key = getCartKey();
     const saved = localStorage.getItem(key);
@@ -49,13 +48,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // 💾 save cart when it changes
   useEffect(() => {
     const key = getCartKey();
     localStorage.setItem(key, JSON.stringify(cart));
   }, [cart, user]);
 
-  // ➕ add item
+  // ➕ add item (no logic change)
   const addToCart = (product: Product) => {
     setCart((prev) => {
       const exists = prev.find((item) => item.id === product.id);
@@ -90,10 +88,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // 🧹 clear
   const clearCart = () => setCart([]);
 
-  // 💰 total
   const getTotal = () => {
     return cart.reduce(
       (total, item) => total + item.price * item.quantity,
