@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { products, Product } from "@/app/data/products";
+import type { Product } from "@/app/data/products";
 import { useCart } from "@/app/context/CartContext";
 import ProductCard from "@/app/components/ProductCard";
 
@@ -13,14 +13,17 @@ export default function Home() {
   const { addToCart } = useCart();
   const [list, setList] = useState<Product[]>([]);
 
+  // ✅ FETCH FROM API INSTEAD OF products.ts
   useEffect(() => {
-    setList(products);
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => setList(data));
   }, []);
 
   const featuredProducts = list.slice(0, 3);
 
-  const handleAddToCart = (product: any, e: React.MouseEvent) => {
-    e.preventDefault();
+ const handleAddToCart = (product: any, e?: React.MouseEvent) => {
+  e?.preventDefault();
 
     if (product.stock === 0) return;
 

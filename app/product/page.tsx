@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
-import { products, Product } from "@/app/data/products";
+import type { Product } from "@/app/data/products";
 import ProductCard from "@/app/components/ProductCard";
 
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,14 @@ import { toast } from "sonner";
 export default function Page() {
   const { addToCart } = useCart();
 
-  const list = products;
+  // ✅ FETCH FROM API
+  const [list, setList] = useState<Product[]>([]);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => setList(data));
+  }, []);
 
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
@@ -30,8 +37,8 @@ export default function Page() {
     );
   });
 
-  const handleAddToCart = (product: Product, e: React.MouseEvent) => {
-    e.preventDefault();
+ const handleAddToCart = (product: any, e?: React.MouseEvent) => {
+  e?.preventDefault();
 
     if (product.stock === 0) {
       toast.error("Out of stock ❌");

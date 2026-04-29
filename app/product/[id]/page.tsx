@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { useCart } from "@/app/context/CartContext";
-import { products, type Product } from "@/app/data/products";
+import type { Product } from "@/app/data/products";
 import { useRouter, useParams } from "next/navigation";
 
 // shadcn
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-// toast
-import { toast } from "sonner";
+// modal (IMPORTANT)
+import ProductCard from "@/app/components/ProductCard";
 
 export default function ProductPage() {
   const { addToCart } = useCart();
@@ -22,35 +22,28 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [index, setIndex] = useState(0);
 
-  // ✅ ALWAYS use products.ts (single source of truth)
+  // 🔥 NEW (controls modal)
+  const [openOptions, setOpenOptions] = useState(false);
+
+  // fetch product
   useEffect(() => {
-    const found = products.find((p: Product) => p.id === id);
-    setProduct(found || null);
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        const found = data.find((p: Product) => p.id === id);
+        setProduct(found || null);
+      });
   }, [id]);
 
   if (!product) {
     return <p className="p-6">Product not found</p>;
   }
 
-  const handleAddToCart = () => {
-    if (product.stock === 0) {
-      toast.error("Out of stock ❌");
-      return;
-    }
-
-    addToCart({
-      ...product,
-      image: product.images?.[0] || "/placeholder.png",
-    });
-
-    toast.success(`${product.name} added to cart 🛒`);
-  };
-
   return (
     <div className="max-w-6xl mx-auto p-8">
       <div className="grid md:grid-cols-2 gap-10">
 
-        {/* IMAGE SLIDER */}
+        {/* IMAGE */}
         <Card>
           <CardContent className="p-6 relative">
             <img
@@ -59,7 +52,6 @@ export default function ProductPage() {
               className="w-full h-80 object-contain"
             />
 
-            {/* LEFT */}
             <button
               onClick={() =>
                 setIndex((prev) =>
@@ -71,7 +63,6 @@ export default function ProductPage() {
               ◀
             </button>
 
-            {/* RIGHT */}
             <button
               onClick={() =>
                 setIndex((prev) =>
@@ -97,7 +88,6 @@ export default function ProductPage() {
             {product.description}
           </p>
 
-          {/* STOCK */}
           <p
             className={`text-sm ${
               product.stock > 0 ? "text-green-500" : "text-red-500"
@@ -111,7 +101,7 @@ export default function ProductPage() {
           {/* ACTIONS */}
           <div className="flex gap-4 mt-4">
             <Button
-              onClick={handleAddToCart}
+              onClick={() => setOpenOptions(true)} // 🔥 FIX
               disabled={product.stock === 0}
             >
               Add to Cart
@@ -131,6 +121,21 @@ export default function ProductPage() {
         </div>
 
       </div>
+
+      {/* 🔥 REUSE YOUR EXISTING MODAL */}
+      {openOptions && (
+        <ProductCard
+          product={product}
+          forceOpen
+          handleAddToCart={(p) => {
+            addToCart({
+              ...p,
+              image: p.images?.[0] || "/placeholder.png",
+            });
+            setOpenOptions(false);
+          }}
+        />
+      )}
     </div>
   );
 }
