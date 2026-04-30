@@ -33,22 +33,22 @@ export default function ThankYouPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-background">
 
-      <Card className="w-full max-w-2xl shadow-xl border">
-        <CardContent className="p-8 space-y-8 text-center">
+      <Card className="w-full max-w-xl shadow-2xl border border-white/10 backdrop-blur-lg">
+        <CardContent className="p-10 space-y-8 text-center">
 
-          {/* 🎉 SUCCESS ICON */}
+          {/* ✅ SUCCESS ICON */}
           <div className="flex justify-center">
-            <div className="w-16 h-16 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
-              <span className="text-3xl">✅</span>
+            <div className="w-20 h-20 flex items-center justify-center rounded-full bg-green-500/20 border border-green-500/30 shadow-lg">
+              <span className="text-4xl">✔</span>
             </div>
           </div>
 
           {/* TITLE */}
           <div className="space-y-2">
-            <h1 className="text-3xl font-bold">
+            <h1 className="text-4xl font-bold tracking-tight">
               Order Confirmed
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Your order has been placed successfully 🎉
             </p>
           </div>
@@ -69,7 +69,7 @@ export default function ThankYouPage() {
           <Separator />
 
           {/* ITEMS */}
-          <div className="space-y-3 text-left">
+          <div className="space-y-4 text-left">
 
             {order?.items?.length === 0 ? (
               <p className="text-muted-foreground text-center">
@@ -79,13 +79,28 @@ export default function ThankYouPage() {
               order?.items?.map((item: any) => (
                 <div
                   key={item.id}
-                  className="flex justify-between items-center text-sm"
+                  className="flex justify-between items-center text-sm bg-white/5 px-4 py-3 rounded-lg border border-white/10"
                 >
-                  <span className="font-medium">
-                    {item.name} × {item.quantity}
-                  </span>
+                  <div>
+                    <p className="font-medium">
+                      {item.name}
+                    </p>
 
-                  <span className="text-muted-foreground">
+                    {/* ✅ show options */}
+                    {item.selectedOptions && (
+                      <p className="text-xs text-muted-foreground">
+                        {Object.entries(item.selectedOptions)
+                          .map(([k, v]) => `${k}: ${v}`)
+                          .join(" • ")}
+                      </p>
+                    )}
+
+                    <p className="text-xs text-muted-foreground">
+                      Qty: {item.quantity}
+                    </p>
+                  </div>
+
+                  <span className="font-medium">
                     ${item.price * item.quantity}
                   </span>
                 </div>
@@ -97,17 +112,21 @@ export default function ThankYouPage() {
           <Separator />
 
           {/* TOTAL */}
-          <div className="flex justify-between items-center text-lg font-semibold">
+          <div className="flex justify-between items-center text-xl font-semibold">
             <span>Total</span>
             <span>${total}</span>
           </div>
 
           {/* ACTIONS */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          <div className="flex flex-col gap-3 pt-4">
 
-            <Button asChild size="lg" className="w-full">
+            <Button
+              asChild
+              size="lg"
+              className="w-full text-base font-semibold"
+            >
               <Link href="/product">
-                Continue Shopping
+                Continue Shopping →
               </Link>
             </Button>
 
@@ -115,10 +134,10 @@ export default function ThankYouPage() {
               asChild
               variant="outline"
               size="lg"
-              className="w-full"
+              className="w-full text-base"
             >
               <Link href="/">
-                Go Home
+                Back to Home
               </Link>
             </Button>
 

@@ -9,7 +9,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-// modal (IMPORTANT)
+// modal
 import ProductCard from "@/app/components/ProductCard";
 
 export default function ProductPage() {
@@ -22,8 +22,9 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [index, setIndex] = useState(0);
 
-  // 🔥 NEW (controls modal)
+  // ✅ modal control
   const [openOptions, setOpenOptions] = useState(false);
+  const [modalKey, setModalKey] = useState(0); // 🔥 important fix
 
   // fetch product
   useEffect(() => {
@@ -101,7 +102,10 @@ export default function ProductPage() {
           {/* ACTIONS */}
           <div className="flex gap-4 mt-4">
             <Button
-              onClick={() => setOpenOptions(true)} // 🔥 FIX
+              onClick={() => {
+                setModalKey((prev) => prev + 1); // 🔥 forces fresh modal
+                setOpenOptions(true);
+              }}
               disabled={product.stock === 0}
             >
               Add to Cart
@@ -122,9 +126,10 @@ export default function ProductPage() {
 
       </div>
 
-      {/* 🔥 REUSE YOUR EXISTING MODAL */}
+      {/* ✅ MODAL */}
       {openOptions && (
         <ProductCard
+          key={modalKey} // 🔥 CRITICAL FIX
           product={product}
           forceOpen
           handleAddToCart={(p) => {
