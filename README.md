@@ -34,28 +34,47 @@ Browse products, view details, and manage your cart — all in a clean and simpl
 
 ```bash
 app/
+├── api/
+│   ├── orders/
+│   │   └── route.ts          # backend: create + fetch orders
+│   └── products/
+│       └── route.ts          # backend: return products
+│
 ├── cart/
-│   └── page.tsx
+│   └── page.tsx              # cart page (shows selected items)
+│
 ├── checkout/
-│   └── page.tsx
+│   └── page.tsx              # checkout form + send order to API
+│
 ├── components/
-│   ├── Navbar.tsx
-│   └── InitProducts.tsx
+│   ├── common/
+│   │   ├── Navbar.tsx        # top navigation bar
+│   │   ├── ProductCard.tsx   # product UI card
+│   │   ├── CartDrawer.tsx    # cart popup drawer
+│   │   └── InitProducts.tsx  # initialize products (optional)
+│
 ├── context/
-│   └── CartContext.tsx
+│   ├── AuthContext.tsx       # login/user state
+│   └── CartContext.tsx       # cart state (add/remove items)
+│
 ├── data/
-│   └── products.ts
+│   └── products.ts           # static product data (fallback)
+│
+├── login/
+│   └── page.tsx              # login page (sets user)
+│
 ├── orders/
-│   └── page.tsx
+│   └── page.tsx              # fetch + display orders from API
+│
 ├── product/
 │   ├── [id]/
-│   │   └── page.tsx
-│   └── page.tsx
+│   │   └── page.tsx          # dynamic product details page
+│   └── page.tsx              # all products page
+│
 ├── thank-you/
-│   └── page.tsx
-├── public/
-│   └── placeholder.png
-├── favicon.ico
-├── globals.css
-├── layout.tsx
-└── page.tsx
+│   └── page.tsx              # success page after checkout
+│
+├── favicon.ico               # browser icon
+├── globals.css               # global styles
+├── layout.tsx                # app layout (navbar wrapper)
+└── page.tsx                  # homepage
