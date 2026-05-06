@@ -2,7 +2,7 @@
 
 import { useCart } from "@/app/context/CartContext";
 import { useAuth } from "@/app/context/AuthContext";
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { products } from "@/app/data/products";
 
@@ -39,68 +39,16 @@ function CheckoutContent() {
 
   const [loading, setLoading] = useState(false);
 
-  // 🔐 HANDLE PENDING ORDER AFTER LOGIN
-  useEffect(() => {
-    if (!user) return;
-
-    const pending = localStorage.getItem("pendingOrder");
-
-    if (pending) {
-      const parsed = JSON.parse(pending);
-
-      const newOrder = {
-        id: Math.random().toString(36).substring(2, 8).toUpperCase(),
-        date: new Date().toLocaleDateString(),
-        items: parsed.items,
-        status: "Pending",
-      };
-
-      const existingOrders = JSON.parse(
-        localStorage.getItem(`orders_${user.name}`) || "[]"
-      );
-
-      localStorage.setItem(
-        `orders_${user.name}`,
-        JSON.stringify([newOrder, ...existingOrders])
-      );
-
-      localStorage.setItem("lastOrder", JSON.stringify(newOrder));
-
-      // update stock
-      const storedProducts =
-        JSON.parse(localStorage.getItem("products") || "null") ||
-        products;
-
-      const updatedProducts = storedProducts.map((p: any) => {
-        const found = parsed.items.find((i: any) => i.id === p.id);
-
-        if (found) {
-          return {
-            ...p,
-            stock: Math.max(p.stock - found.quantity, 0),
-          };
-        }
-
-        return p;
-      });
-
-      localStorage.setItem("products", JSON.stringify(updatedProducts));
-
-      localStorage.removeItem("pendingOrder");
-      clearCart();
-
-      router.push("/thank-you");
-    }
-  }, [user]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (loading) return;
 
     const { name, address, card } = form;
@@ -111,69 +59,52 @@ function CheckoutContent() {
     }
 
     if (!user) {
-      localStorage.setItem(
-        "pendingOrder",
-        JSON.stringify({
-          items: itemsToShow,
-          total,
-        })
-      );
-
       router.push("/login");
       return;
     }
 
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const newOrder = {
-      id: Math.random().toString(36).substring(2, 8).toUpperCase(),
-      date: new Date().toLocaleDateString(),
-      items: itemsToShow,
-      status: "Pending",
-    };
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: itemsToShow,
+          user: user.name,
+        }),
+      });
 
-    const existingOrders = JSON.parse(
-      localStorage.getItem(`orders_${user.name}`) || "[]"
-    );
+      const data = await response.json();
 
-    localStorage.setItem(
-      `orders_${user.name}`,
-      JSON.stringify([newOrder, ...existingOrders])
-    );
+      localStorage.setItem(
+        "lastOrder",
+        JSON.stringify(data)
+      );
 
-    localStorage.setItem("lastOrder", JSON.stringify(newOrder));
+      clearCart();
 
-    // update stock
-    const storedProducts =
-      JSON.parse(localStorage.getItem("products") || "null") ||
-      products;
+      toast.success("Order placed successfully 🎉");
 
-    const updatedProducts = storedProducts.map((p: any) => {
-      const found = itemsToShow.find((i) => i.id === p.id);
-
-      if (found) {
-        return {
-          ...p,
-          stock: Math.max(p.stock - found.quantity, 0),
-        };
-      }
-
-      return p;
-    });
-
-    localStorage.setItem("products", JSON.stringify(updatedProducts));
-
-    clearCart();
-
-    setTimeout(() => {
       router.push("/thank-you");
-    }, 800);
+
+    } catch (error) {
+      console.error(error);
+
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="max-w-6xl mx-auto p-8 space-y-8">
 
-      <h1 className="text-3xl font-bold">Checkout</h1>
+      <h1 className="text-3xl font-bold">
+        Checkout
+      </h1>
 
       <div className="grid md:grid-cols-2 gap-10">
 
@@ -181,7 +112,9 @@ function CheckoutContent() {
         <Card>
           <CardContent className="p-6 space-y-6">
 
-            <h2 className="text-xl font-semibold">Shipping Details</h2>
+            <h2 className="text-xl font-semibold">
+              Shipping Details
+            </h2>
 
             <Input
               name="name"
@@ -209,7 +142,9 @@ function CheckoutContent() {
               disabled={loading}
               className="w-full"
             >
-              {loading ? "Processing..." : "Place Order"}
+              {loading
+                ? "Processing..."
+                : "Place Order"}
             </Button>
 
           </CardContent>
@@ -219,17 +154,25 @@ function CheckoutContent() {
         <Card>
           <CardContent className="p-6 space-y-4">
 
-            <h2 className="text-xl font-semibold">Order Summary</h2>
+            <h2 className="text-xl font-semibold">
+              Order Summary
+            </h2>
 
             {itemsToShow.length === 0 && (
-              <p className="text-muted-foreground">No items</p>
+              <p className="text-muted-foreground">
+                No items
+              </p>
             )}
 
             {itemsToShow.map((item) => (
-              <div key={item.id} className="flex justify-between text-sm">
+              <div
+                key={item.id}
+                className="flex justify-between text-sm"
+              >
                 <span>
                   {item.name} × {item.quantity}
                 </span>
+
                 <span>
                   ${item.price * item.quantity}
                 </span>

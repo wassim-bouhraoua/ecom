@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 
 // shadcn
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
@@ -16,49 +15,47 @@ export default function OrdersPage() {
 
   const [orders, setOrders] = useState<any[]>([]);
 
-  // 🔐 protect page
+  // protect page
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
 
-  // 📦 load orders
+  // fetch backend orders
   useEffect(() => {
     if (!user) return;
 
-    const saved = localStorage.getItem(`orders_${user.name}`);
+    fetch("/api/orders")
+      .then((res) => res.json())
+      .then((data) => {
 
-    if (saved) {
-      const parsed = JSON.parse(saved);
+        const userOrders = data.filter(
+          (order: any) =>
+            order.user === user.name
+        );
 
-      const withStatus = parsed.map((order: any) => ({
-        ...order,
-        status: order.status || "Pending",
-      }));
+        setOrders(userOrders);
 
-      setOrders(withStatus);
-    } else {
-      setOrders([]);
-    }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
   }, [user]);
 
-  const deleteOrder = (id: string) => {
-    const updated = orders.filter((o) => o.id !== id);
-    setOrders(updated);
+  const getStatusVariant = (
+    status: string
+  ) => {
+    if (status === "Pending")
+      return "secondary";
 
-    if (user) {
-      localStorage.setItem(
-        `orders_${user.name}`,
-        JSON.stringify(updated)
-      );
-    }
-  };
+    if (status === "Shipped")
+      return "default";
 
-  const getStatusVariant = (status: string) => {
-    if (status === "Pending") return "secondary";
-    if (status === "Shipped") return "default";
-    if (status === "Delivered") return "outline";
+    if (status === "Delivered")
+      return "outline";
+
     return "secondary";
   };
 
@@ -67,7 +64,9 @@ export default function OrdersPage() {
   return (
     <div className="max-w-4xl mx-auto p-8 space-y-8">
 
-      <h1 className="text-3xl font-bold">Your Orders</h1>
+      <h1 className="text-3xl font-bold">
+        Your Orders
+      </h1>
 
       {orders.length === 0 && (
         <p className="text-muted-foreground">
@@ -75,74 +74,73 @@ export default function OrdersPage() {
         </p>
       )}
 
-      {orders.map((order) => {
-        const total = (order.items || []).reduce(
-          (sum: number, item: any) =>
-            sum + item.price * item.quantity,
-          0
-        );
+      {orders.map((order) => (
+        <Card
+          key={order.id}
+          className="shadow-sm"
+        >
+          <CardContent className="p-6 space-y-4">
 
-        return (
-          <Card key={order.id} className="shadow-sm">
-            <CardContent className="p-6 space-y-4">
+            {/* HEADER */}
+            <div className="flex justify-between items-center">
 
-              {/* HEADER */}
-              <div className="flex justify-between items-center">
+              <div>
+                <p className="font-semibold">
+                  Order #{order.id}
+                </p>
 
-                <div>
-                  <p className="font-semibold">
-                    Order #{order.id}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {order.date}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-
-                  <Badge variant={getStatusVariant(order.status)}>
-                    {order.status}
-                  </Badge>
-
-                  <p className="font-semibold">
-                    ${total}
-                  </p>
-
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => deleteOrder(order.id)}
-                  >
-                    Delete
-                  </Button>
-
-                </div>
+                <p className="text-sm text-muted-foreground">
+                  {order.date}
+                </p>
               </div>
 
-              <Separator />
+              <div className="flex items-center gap-3">
 
-              {/* ITEMS */}
-              <div className="space-y-2">
-                {order.items?.map((item: any) => (
+                <Badge
+                  variant={getStatusVariant(
+                    order.status
+                  )}
+                >
+                  {order.status}
+                </Badge>
+
+                <p className="font-semibold">
+                  ${order.total}
+                </p>
+
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* ITEMS */}
+            <div className="space-y-2">
+
+              {order.items?.map(
+                (item: any) => (
                   <div
                     key={item.id}
                     className="flex justify-between text-sm"
                   >
                     <span>
-                      {item.name} × {item.quantity}
+                      {item.name} ×{" "}
+                      {item.quantity}
                     </span>
 
                     <span className="text-muted-foreground">
-                      ${item.price * item.quantity}
+                      $
+                      {item.price *
+                        item.quantity}
                     </span>
                   </div>
-                ))}
-              </div>
+                )
+              )}
 
-            </CardContent>
-          </Card>
-        );
-      })}
+            </div>
+
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

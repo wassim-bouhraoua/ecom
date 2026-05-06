@@ -1,0 +1,217 @@
+[
+  {
+    "id": "KQGCSZ",
+    "date": "06/05/2026",
+    "items": [
+      {
+        "id": "laptop",
+        "name": "Laptop",
+        "category": "laptop",
+        "price": 1000,
+        "images": [
+          "/products/laptop/laptop1.webp",
+          "/products/laptop/laptop2.webp",
+          "/products/laptop/laptop3.webp"
+        ],
+        "description": "High performance laptop for work and gaming.",
+        "stock": 9,
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              "black",
+              "grey"
+            ]
+          },
+          {
+            "name": "GPU",
+            "values": [
+              "RTX 3050",
+              "RTX 3060"
+            ]
+          },
+          {
+            "name": "Storage",
+            "values": [
+              "512GB",
+              "1TB"
+            ]
+          }
+        ],
+        "selectedOptions": {
+          "GPU": "RTX 3050",
+          "Color": "grey",
+          "Storage": "512GB"
+        },
+        "image": "/products/laptop/laptop1.webp",
+        "quantity": 1
+      }
+    ],
+    "total": 1000,
+    "user": "test1",
+    "status": "Pending"
+  },
+  {
+    "id": "MKYRCG",
+    "date": "06/05/2026",
+    "items": [
+      {
+        "id": "monitor",
+        "name": "Monitor",
+        "category": "laptop",
+        "price": 400,
+        "images": [
+          "/products/monitor/monitor1.webp",
+          "/products/monitor/monitor2.webp",
+          "/products/monitor/monitor3.webp"
+        ],
+        "description": "Full HD monitor for work and gaming.",
+        "stock": 3,
+        "options": [
+          {
+            "name": "Size",
+            "values": [
+              "24 inch",
+              "27 inch",
+              "32 inch"
+            ]
+          }
+        ],
+        "selectedOptions": {
+          "Size": "32 inch"
+        },
+        "image": "/products/monitor/monitor1.webp",
+        "quantity": 1
+      }
+    ],
+    "total": 400,
+    "user": "soufian",
+    "status": "Pending"
+  },
+  {
+    "id": "C7EUDT",
+    "date": "06/05/2026",
+    "items": [
+      {
+        "id": "laptop",
+        "name": "Laptop",
+        "category": "laptop",
+        "price": 1000,
+        "images": [
+          "/products/laptop/laptop1.webp",
+          "/products/laptop/laptop2.webp",
+          "/products/laptop/laptop3.webp"
+        ],
+        "description": "High performance laptop for work and gaming.",
+        "stock": 9,
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              "black",
+              "grey"
+            ]
+          },
+          {
+            "name": "GPU",
+            "values": [
+              "RTX 3050",
+              "RTX 3060"
+            ]
+          },
+          {
+            "name": "Storage",
+            "values": [
+              "512GB",
+              "1TB"
+            ]
+          }
+        ],
+        "selectedOptions": {
+          "Storage": "1TB",
+          "GPU": "RTX 3060",
+          "Color": "grey"
+        },
+        "image": "/products/laptop/laptop1.webp",
+        "quantity": 2
+      }
+    ],
+    "total": 2000,
+    "user": "wassim",
+    "status": "Pending"
+  },
+  {
+    "id": "0FQW6U",
+    "date": "06/05/2026",
+    "items": [
+      {
+        "id": "phone",
+        "name": "Phone",
+        "category": "phone",
+        "price": 300,
+        "images": [
+          "/products/phone/phone1.webp",
+          "/products/phone/phone2.webp",
+          "/products/phone/phone3.webp"
+        ],
+        "description": "A powerful smartphone with modern features.",
+        "stock": 10,
+        "options": [
+          {
+            "name": "Color",
+            "values": [
+              "black",
+              "orange",
+              "white"
+            ]
+          },
+          {
+            "name": "Storage",
+            "values": [
+              "256GB",
+              "512GB",
+              "1TB"
+            ]
+          }
+        ],
+        "selectedOptions": {
+          "Storage": "512GB",
+          "Color": "orange"
+        },
+        "image": "/products/phone/phone1.webp",
+        "quantity": 1
+      },
+      {
+        "id": "keyboard",
+        "name": "Keyboard",
+        "category": "laptop",
+        "price": 80,
+        "images": [
+          "/products/keyboard/keyboard1.webp",
+          "/products/keyboard/keyboard2.webp",
+          "/products/keyboard/keyboard3.webp"
+        ],
+        "description": "Mechanical keyboard with smooth typing.",
+        "stock": 12,
+        "options": [
+          {
+            "name": "Switch",
+            "values": [
+              "blue",
+              "red",
+              "brown"
+            ]
+          }
+        ],
+        "selectedOptions": {
+          "Switch": "brown"
+        },
+        "image": "/products/keyboard/keyboard1.webp",
+        "quantity": 1
+      }
+    ],
+    "total": 380,
+    "user": "wassim",
+    "status": "Pending"
+  }
+]
