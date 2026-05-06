@@ -36,45 +36,61 @@ Browse products, view details, and manage your cart — all in a clean and simpl
 app/
 ├── api/
 │   ├── orders/
-│   │   └── route.ts          # backend: create + fetch orders
-│   └── products/
-│       └── route.ts          # backend: return products
+│   │   └── route.ts              # backend: create + fetch orders
+│   │
+│   ├── products/
+│   │   └── route.ts              # backend: return products
+│   │
+│   ├── users/
+│   │   └── route.ts              # backend: create + fetch users
+│   │
+│   └── cart/
+│       └── route.ts              # backend: save + fetch user cart
 │
 ├── cart/
-│   └── page.tsx              # cart page (shows selected items)
+│   └── page.tsx                  # cart page
 │
 ├── checkout/
-│   └── page.tsx              # checkout form + send order to API
+│   └── page.tsx                  # checkout form + place order
 │
 ├── components/
 │   ├── common/
-│   │   ├── Navbar.tsx        # top navigation bar
-│   │   ├── ProductCard.tsx   # product UI card
-│   │   ├── CartDrawer.tsx    # cart popup drawer
-│   │   └── InitProducts.tsx  # initialize products (optional)
-│
+│   │   ├── Navbar.tsx            # top navigation bar
+│   │   ├── ProductCard.tsx       # reusable product card
+│   │   ├── CartDrawer.tsx        # cart sidebar drawer
+│   │   └── InitProducts.tsx      # optional product initialization
+│ 
 ├── context/
-│   ├── AuthContext.tsx       # login/user state
-│   └── CartContext.tsx       # cart state (add/remove items)
+│   ├── AuthContext.tsx           # frontend auth state + backend users API
+│   └── CartContext.tsx           # frontend cart state + backend cart API
 │
 ├── data/
-│   └── products.ts           # static product data (fallback)
+│   ├── products.ts               # static products source
+│   ├── orders.json               # persistent orders storage
+│   ├── users.json                # persistent users storage
+│   └── carts.json                # persistent carts storage
+│
+├── lib/
+│   └── utils.ts                  # utility/helper functions
 │
 ├── login/
-│   └── page.tsx              # login page (sets user)
+│   └── page.tsx                  # login page
 │
 ├── orders/
-│   └── page.tsx              # fetch + display orders from API
+│   └── page.tsx                  # fetch + display user orders
 │
 ├── product/
 │   ├── [id]/
-│   │   └── page.tsx          # dynamic product details page
-│   └── page.tsx              # all products page
+│   │   └── page.tsx              # dynamic product details page
+│   │
+│   └── page.tsx                  # all products page
 │
 ├── thank-you/
-│   └── page.tsx              # success page after checkout
+│   └── page.tsx                  # success page after checkout
 │
-├── favicon.ico               # browser icon
-├── globals.css               # global styles
-├── layout.tsx                # app layout (navbar wrapper)
-└── page.tsx                  # homepage
+├── favicon.ico                   # browser icon
+├── globals.css                   # global styles
+├── layout.tsx                    # root layout
+└── page.tsx                      # homepage
+
+
